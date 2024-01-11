@@ -4,9 +4,13 @@ import InfoIcon from '@mui/icons-material/Info';
 import { Alert, Autocomplete, Button, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Snackbar, Stack, TextField, Typography } from "@mui/material"
 import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from "react"
 import MoleculeStructure from "./MoleculeStructure/MoleculeStructure"
-import { ReactionSchemeLocation } from "@prisma/client"
 import { AddReagentHandlerRequest, AddReagentHandlerResponse, GetReagentHandlerResponse, GetSimilarReagentsByNameHandlerResponse } from "../../../server/routes/reagents"
 import { AssignReagentToExperimentHandlerRequest, AssignReagentToExperimentHandlerResponse } from "../../../server/routes/experiments"
+
+
+// in the client, @prisma/client is not available because that is in the backend
+// that is not available when the client and server are in different containers
+type ReactionSchemeLocation = "LEFT_SIDE" | "ABOVE_ARROW" | "BELOW_ARROW" | "RIGHT_SIDE"
 
 const NUMBER_INPUT_ERROR_MSG = "Please enter a valid number without commas, and use a decimal point if needed"
 
