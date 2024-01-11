@@ -36,8 +36,7 @@ export const createExperimentHandler = async (
     });
     res.json({ experiment: experiment });
   } catch (e) {
-    console.log(e);
-    throw e;
+    return res.status(500).send(JSON.stringify(`Error: ${e}`));
   }
 };
 
