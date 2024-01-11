@@ -1,21 +1,99 @@
-import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
-import { FormEventHandler, MouseEventHandler } from "react";
+import { Button, DialogActions, DialogContent, DialogTitle, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material"
+import { Dispatch, SetStateAction, SyntheticEvent, useState } from "react";
+import { CreateProjectHandlerRequest, CreateProjectHandlerResponse, ProjectWithDataBuffer } from "../../../server/routes/projects";
 
 interface Props {
-    file?: string;
-    handleNameOnChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
-    handleClearFile: MouseEventHandler;
-    handleSubmit: FormEventHandler<HTMLFormElement>;
-    handleFileUploadChange: React.ChangeEventHandler<HTMLInputElement>
+    parentProjectId?: string
+    setProjects: Dispatch<SetStateAction<ProjectWithDataBuffer[]>>
+    setOpen: Dispatch<SetStateAction<boolean>>
+    projects: ProjectWithDataBuffer[]
 }
 
-export const CreateProjectDialog = ({ handleNameOnChange, file, handleClearFile, handleSubmit, handleFileUploadChange }: Props) => {
+type Options = "PROJECT" | "EXPERIMENT"
+
+export const CreateProjectDialog = ({ parentProjectId, setProjects, projects, setOpen }: Props) => {
+    const [file, setFile] = useState<File>()
+    const [type, setType] = useState<Options>()
+    const [projectName, setProjectName] = useState('')
+
+    const handleTypeToggle = (_: React.MouseEvent<HTMLElement>, newInput: Options | null) => {
+        if (newInput !== null) {
+            setType(newInput)
+        }
+    }
+
+    const handleNameOnChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setProjectName(event.target.value)
+    }
+
+    const handleFileUploadChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = (event.target as HTMLInputElement).files
+        if (files && files[0]) {
+            setFile(() => files[0])
+        }
+    }
+
+    const handleClearFile = (event: SyntheticEvent) => {
+        event.preventDefault()
+        setFile(undefined)
+    }
+
+    const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        const url = 'http://localhost:3000/projects/'
+        const formData = new FormData()
+
+        const bodyFieldsForAddingProject: CreateProjectHandlerRequest = {
+            name: projectName,
+            parentId: parentProjectId ?? undefined
+        }
+
+        if (file) {
+            formData.append('projectImage',
+                new Blob(
+                    [file], { type: 'application/octet-stream' }
+                ))
+
+        }
+
+        for (const [key, value] of Object.entries(bodyFieldsForAddingProject)) {
+            formData.append(key, value)
+        }
+
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                body: formData
+            })
+            const newProject: CreateProjectHandlerResponse = await response.json()
+            const newP = [...projects, newProject.project]
+            setProjects(newP)
+            setOpen(false)
+            setFile(undefined)
+        } catch (error) {
+            console.error("Error: ", error)
+        }
+    }
 
     return (
-        <div>
+        <>
             <form onSubmit={handleSubmit}>
+                <ToggleButtonGroup
+                    value={type}
+                    exclusive
+                    onChange={handleTypeToggle}
+                    aria-label="project-or-experiment"
+                >
+                    <ToggleButton value="PROJECT" aria-label="Project">
+                        PROJECT
+                    </ToggleButton>
+                    <ToggleButton value="EXPERIMENT" aria-label="Experiment">
+                        EXPERIMENT
+                    </ToggleButton>
+                </ToggleButtonGroup>
                 <DialogTitle>
-                    Create a new project
+                    Create a new {type === "EXPERIMENT" ? "experiment" : "project"}
                 </DialogTitle>
                 <DialogContent>
                     <TextField label="Project name"
@@ -39,15 +117,12 @@ export const CreateProjectDialog = ({ handleNameOnChange, file, handleClearFile,
                             onChange={handleFileUploadChange}
                         />
                     </Button>
-                    <div>
-                        {file}
-                    </div>
-
+                    <>{file}</>
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" type="submit">Create project</Button>
                 </DialogActions>
             </form>
-        </div>
+        </>
     )
 } 

@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { Button, ButtonBase, Card, CardContent, Dialog, Divider, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack'
 import Container from '@mui/material/Paper';
-import { CreateProjectHandlerRequest, CreateProjectHandlerResponse, ProjectWithDataBuffer } from '../../../server/routes/projects';
-import React, { Dispatch, SetStateAction, SyntheticEvent, useState } from 'react'
+import { ProjectWithDataBuffer } from '../../../server/routes/projects';
+import { Dispatch, SetStateAction, useState } from 'react'
 import { CreateProjectDialog } from './CreateProjectDialog';
 
 interface Props {
@@ -39,9 +39,7 @@ const BreadCrumbStack = ({ pathToProject }: BreadCrumbStackProps) => {
 
 
 export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, setProjects }: Props) => {
-    const [file, setFile] = useState<File>()
     const [open, setOpen] = useState(false)
-    const [projectName, setProjectName] = useState('')
 
     const openCreateProjectDialog = () => {
         setOpen(true)
@@ -49,63 +47,6 @@ export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, 
 
     const closeCreateProjectDialog = () => {
         setOpen(false)
-    }
-
-    const handleNameOnChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setProjectName(event.target.value)
-    }
-
-
-    const handleFileUploadChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = (event.target as HTMLInputElement).files
-        if (files && files[0]) {
-            setFile(() => files[0])
-        }
-    }
-
-    const handleClearFile = (event: SyntheticEvent) => {
-        event.preventDefault()
-        setFile(undefined)
-    }
-
-
-
-    const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        const url = 'http://localhost:3000/projects/'
-        const formData = new FormData()
-
-        const bodyFieldsForAddingProject: CreateProjectHandlerRequest = {
-            name: projectName,
-            parentId: parentProjectId ?? undefined
-        }
-
-        if (file) {
-            formData.append('projectImage',
-                new Blob(
-                    [file], { type: 'application/octet-stream' }
-                ))
-
-        }
-
-        for (const [key, value] of Object.entries(bodyFieldsForAddingProject)) {
-            formData.append(key, value)
-        }
-
-
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                body: formData
-            })
-            const newProject: CreateProjectHandlerResponse = await response.json()
-            const newP = [...projects, newProject.project]
-            setProjects(newP)
-            setOpen(false)
-            setFile(undefined)
-        } catch (error) {
-            console.error("Error: ", error)
-        }
     }
 
     return (
@@ -156,11 +97,11 @@ export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, 
             </Stack >
             <Dialog open={open} onClose={closeCreateProjectDialog}>
                 <CreateProjectDialog
-                    file={file?.name}
-                    handleNameOnChange={handleNameOnChange}
-                    handleClearFile={handleClearFile}
-                    handleFileUploadChange={handleFileUploadChange}
-                    handleSubmit={handleSubmit} />
+                    parentProjectId={parentProjectId}
+                    setProjects={setProjects}
+                    setOpen={setOpen}
+                    projects={projects}
+                />
             </Dialog>
         </>
     )
