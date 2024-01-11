@@ -104,10 +104,14 @@ export const getExperimentByIdHandler = async (
   req: TypedRequestBody<GetExperimentByIdHandlerRequest>,
   res: TypedResponse<GetExperimentByIdHandlerResponse>,
 ) => {
-  const result = await prisma.experiment.findUnique({
-    where: { id: Number(req.params.id) },
-  });
-  return res.json({ experiment: result });
+  try {
+    const result = await prisma.experiment.findUnique({
+      where: { id: Number(req.params.id) },
+    });
+    return res.json({ experiment: result });
+  } catch (e) {
+    return res.status(500).send(JSON.stringify(`Error: ${e}`));
+  }
 };
 
 experimentRoutes.post("/", createExperimentHandler);
