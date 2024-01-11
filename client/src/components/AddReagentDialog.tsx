@@ -397,10 +397,10 @@ const ReactionSchemeLocationForm = ({ setReactionSchemeLocation }: ReactionSchem
             name="row-radio-buttons-group"
             onChange={handleChange}
         >
-            <FormControlLabel value={ReactionSchemeLocation.LEFT_SIDE} control={<Radio />} label="Left side" />
-            <FormControlLabel value={ReactionSchemeLocation.ABOVE_ARROW} control={<Radio />} label="Above arrow" />
-            <FormControlLabel value={ReactionSchemeLocation.BELOW_ARROW} control={<Radio />} label="Below arrow" />
-            <FormControlLabel value={ReactionSchemeLocation.RIGHT_SIDE} control={<Radio />} label="Right side" />
+            <FormControlLabel value={"LEFT_SIDE"} control={<Radio />} label="Left side" />
+            <FormControlLabel value={"ABOVE_ARROW"} control={<Radio />} label="Above arrow" />
+            <FormControlLabel value={"BELOW_ARROW"} control={<Radio />} label="Below arrow" />
+            <FormControlLabel value={"RIGHT_SIDE"} control={<Radio />} label="Right side" />
         </RadioGroup>
     </FormControl>)
 }
