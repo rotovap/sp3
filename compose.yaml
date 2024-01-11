@@ -23,6 +23,9 @@ services:
     working_dir: /client
     volumes:
       - ./client:/client
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     image: mcs07/postgres-rdkit
