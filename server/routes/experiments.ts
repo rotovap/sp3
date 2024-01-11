@@ -92,5 +92,24 @@ export const assignReagentToExperiment = async (
   }
 };
 
+export interface GetExperimentByIdHandlerRequest {
+  id: string;
+}
+
+export interface GetExperimentByIdHandlerResponse {
+  experiment: Experiment | null;
+}
+
+export const getExperimentByIdHandler = async (
+  req: TypedRequestBody<GetExperimentByIdHandlerRequest>,
+  res: TypedResponse<GetExperimentByIdHandlerResponse>,
+) => {
+  const result = await prisma.experiment.findUnique({
+    where: { id: Number(req.params.id) },
+  });
+  return res.json({ experiment: result });
+};
+
 experimentRoutes.post("/", createExperimentHandler);
 experimentRoutes.post("/assignReagentToExperiment", assignReagentToExperiment);
+experimentRoutes.get("/:id", getExperimentByIdHandler);
