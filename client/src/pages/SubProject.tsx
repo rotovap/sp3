@@ -2,12 +2,14 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { GetPathToProjectHandlerResponse, GetProjectByIdHandlerResponse, ProjectWithDataBuffer } from "../../../server/routes/projects"
 import { ProjectStack } from "../components/ProjectStack"
+import { Experiment } from "@prisma/client"
 
 export const SubProjectPage = () => {
     let { id } = useParams()
     const [path, setPath] = useState<{ id: number, name: string, parentId: number }[]>([])
     const [subProjects, setSubProjects] = useState<ProjectWithDataBuffer[]>([])
     const [title, setTitle] = useState('')
+    const [experiments, setExperiments] = useState<Experiment[]>([])
 
     useEffect(() => {
         const apiCall = async () => {
@@ -16,7 +18,9 @@ export const SubProjectPage = () => {
             const resultProject: GetProjectByIdHandlerResponse = await responseProject.json()
             const resultPath: GetPathToProjectHandlerResponse = await responsePath.json()
             const children = resultProject.project.children ?? []
+            const experiments = resultProject.project.experiments ?? []
             setSubProjects(children)
+            setExperiments(experiments)
             // path comes as leaf to root -- reverse it for the component so that it renders
             // with the root at the top and leaf at the bottom
             // don't show the current project
@@ -34,7 +38,10 @@ export const SubProjectPage = () => {
                 title={title}
                 projects={subProjects}
                 setProjects={setSubProjects}
-                pathToProject={path ?? undefined} />
+                pathToProject={path ?? undefined}
+                experiments={experiments}
+                setExperiments={setExperiments}
+            />
         </>
     )
 }

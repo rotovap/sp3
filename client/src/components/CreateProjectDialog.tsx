@@ -1,13 +1,9 @@
 import { Button, DialogActions, DialogContent, DialogTitle, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { Dispatch, SetStateAction, SyntheticEvent, useState } from "react";
 import { CreateProjectHandlerRequest, CreateProjectHandlerResponse, ProjectWithDataBuffer } from "../../../server/routes/projects";
+import { CreateExperimentHandlerResponse } from "../../../server/routes/experiments";
+import { Experiment } from "@prisma/client";
 
-interface Props {
-    parentProjectId?: string
-    setProjects: Dispatch<SetStateAction<ProjectWithDataBuffer[]>>
-    setOpen: Dispatch<SetStateAction<boolean>>
-    projects: ProjectWithDataBuffer[]
-}
 
 type EntryTypeOptions = "PROJECT" | "EXPERIMENT"
 
@@ -19,8 +15,10 @@ interface EntryFormProps {
     setProjects: Dispatch<SetStateAction<ProjectWithDataBuffer[]>>
     setOpen: Dispatch<SetStateAction<boolean>>
     projects: ProjectWithDataBuffer[]
+    experiments?: Experiment[]
+    setExperiments: Dispatch<SetStateAction<Experiment[]>>
 }
-const EntryForm = ({ type, parentProjectId, setProjects, projects, setOpen }: EntryFormProps
+const EntryForm = ({ type, parentProjectId, setProjects, projects, setOpen, experiments, setExperiments }: EntryFormProps
 ) => {
     const [projectName, setProjectName] = useState('')
     const [file, setFile] = useState<File>()
@@ -40,11 +38,38 @@ const EntryForm = ({ type, parentProjectId, setProjects, projects, setOpen }: En
             setFile(() => files[0])
         }
     }
-    //TODO: route to experiments or projects
+
     const handleSubmitExperiment = async (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault()
-        console.log('submitted expt')
+        try {
+            const exptToAdd = {
+                name: projectName,
+                parentId: parentProjectId
+            }
+
+            const response = await fetch(`http://localhost:3000/experiments/`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(exptToAdd)
+            })
+            const newExpt: CreateExperimentHandlerResponse = await response.json()
+            // set a experiment array
+            if (experiments) {
+                const newExperiments = [...experiments, newExpt.experiment]
+                setExperiments(newExperiments)
+            } else {
+                setExperiments([newExpt.experiment])
+            }
+
+            setOpen(false)
+            setFile(undefined)
+        } catch (error) {
+            console.error("Error: ", error)
+        }
     }
+
     const handleSubmitProject = async (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault()
         const url = 'http://localhost:3000/projects/'
@@ -99,20 +124,26 @@ const EntryForm = ({ type, parentProjectId, setProjects, projects, setOpen }: En
                         onChange={(event) => {
                             handleNameOnChange(event)
                         }} />
-                    <Button component="label" variant="contained">
-                        {file ?
-                            <Button variant="contained"
-                                onClick={handleClearFile}>
-                                Clear attachment
-                            </Button>
-                            :
-                            'Attach reaction scheme or image'}
-                        <input type="file"
-                            hidden
-                            onChange={handleFileUploadChange}
-                        />
-                    </Button>
-                    <>{file?.name}</>
+                    {
+                        type === "PROJECT" ?
+                            <>
+                                <Button component="label" variant="contained">
+                                    {file ?
+                                        <Button variant="contained"
+                                            onClick={handleClearFile}>
+                                            Clear attachment
+                                        </Button>
+                                        :
+                                        'Attach reaction scheme or image'}
+                                    <input type="file"
+                                        hidden
+                                        onChange={handleFileUploadChange}
+                                    />
+                                </Button>
+                                <>{file?.name}</>
+                            </>
+                            : null
+                    }
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" type="submit">Create {type === "EXPERIMENT" ? "Experiment" : "Project"}</Button>
@@ -123,7 +154,16 @@ const EntryForm = ({ type, parentProjectId, setProjects, projects, setOpen }: En
 
 }
 
-export const CreateEntryDialog = ({ parentProjectId, setProjects, projects, setOpen }: Props) => {
+interface Props {
+    parentProjectId?: string
+    setProjects: Dispatch<SetStateAction<ProjectWithDataBuffer[]>>
+    setOpen: Dispatch<SetStateAction<boolean>>
+    projects: ProjectWithDataBuffer[]
+    setExperiments: Dispatch<SetStateAction<Experiment[]>>
+    experiments?: Experiment[]
+}
+
+export const CreateEntryDialog = ({ parentProjectId, setProjects, projects, setOpen, experiments, setExperiments }: Props) => {
     const [type, setType] = useState<EntryTypeOptions>("PROJECT")
 
     const handleTypeToggle = (_: React.MouseEvent<HTMLElement>, newInput: EntryTypeOptions | null) => {
@@ -154,6 +194,8 @@ export const CreateEntryDialog = ({ parentProjectId, setProjects, projects, setO
                 setProjects={setProjects}
                 projects={projects}
                 setOpen={setOpen}
+                experiments={experiments}
+                setExperiments={setExperiments}
             />
         </>
     )
