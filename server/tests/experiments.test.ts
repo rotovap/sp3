@@ -143,4 +143,28 @@ describe("experiments routes", () => {
         .expect(400);
     });
   });
+
+  describe("GET /:id", () => {
+    test("returns an experiment if found", async () => {
+      const result = await supertest(server).get("/experiments/1");
+      const expectedResult = {
+        experiment: {
+          parentId: 4,
+          name: "01012024-suzuki coupling",
+          id: 1,
+        },
+      };
+
+      expect(result.body).toStrictEqual(expectedResult);
+    });
+
+    test("returns null if experiment not found", async () => {
+      const result = await supertest(server).get("/experiments/100");
+      const expectedResult = {
+        experiment: null,
+      };
+
+      expect(result.body).toStrictEqual(expectedResult);
+    });
+  });
 });
