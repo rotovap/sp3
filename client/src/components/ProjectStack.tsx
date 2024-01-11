@@ -96,7 +96,7 @@ export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, 
                         ? experiments.map((i, idx) => {
                             return (
                                 <ButtonBase key={idx} component={Link} to={`/experiments/${i.id}`} >
-                                    <Container variant="outlined" sx={{ flexGrow: 1, padding: 2 }}>
+                                    <Container variant="outlined" sx={{ color: 'red', flexGrow: 1, padding: 2 }}>
                                         <Stack direction="row" spacing={10}>
                                             <Stack spacing={2}>
                                                 <Stack>
