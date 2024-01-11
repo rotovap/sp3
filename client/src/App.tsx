@@ -43,7 +43,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<ProjectOverview />} />
                         <Route path="/projects/:id" element={<SubProjectPage />} />
-                        <Route path="/projects/:id/experiment/:experiment_id" element={<ExperimentPage />} />
+                        <Route path="/experiments/:id" element={<ExperimentPage />} />
                     </Routes>
                 </CssBaseline>
             </ThemeProvider >
