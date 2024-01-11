@@ -76,6 +76,7 @@ describe("projects handlers", () => {
             name: "EGFR inhibitors",
             parentId: null,
             base64image: null,
+            experiments: [],
             children: [
               {
                 id: 2,
@@ -88,6 +89,37 @@ describe("projects handlers", () => {
                 parentId: 1,
                 id: 3,
                 base64image: expect.any(String),
+              },
+            ],
+          },
+        };
+
+        expect(result.statusCode).toEqual(200);
+        expect(result.body).toStrictEqual(expectedResult);
+      });
+
+      test("returns experiments", async () => {
+        const result = await supertest(server).get("/projects/4");
+
+        const expectedResult = {
+          project: {
+            id: 4,
+            name: "step 1 - aryl coupling",
+            parentId: 2,
+            base64image: null,
+            experiments: [
+              {
+                id: 1,
+                parentId: 4,
+                name: "01012024-suzuki coupling",
+              },
+            ],
+            children: [
+              {
+                name: "screening catalysts",
+                parentId: 4,
+                id: 6,
+                base64image: null,
               },
             ],
           },
