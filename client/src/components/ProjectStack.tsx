@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack'
 import Container from '@mui/material/Paper';
 import { ProjectWithDataBuffer } from '../../../server/routes/projects';
 import { Dispatch, SetStateAction, useState } from 'react'
-import { CreateProjectDialog } from './CreateProjectDialog';
+import { CreateEntryDialog } from './CreateProjectDialog';
 
 interface Props {
     projects: ProjectWithDataBuffer[]
@@ -96,7 +96,7 @@ export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, 
                 </Stack>
             </Stack >
             <Dialog open={open} onClose={closeCreateProjectDialog}>
-                <CreateProjectDialog
+                <CreateEntryDialog
                     parentProjectId={parentProjectId}
                     setProjects={setProjects}
                     setOpen={setOpen}

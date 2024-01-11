@@ -9,17 +9,25 @@ interface Props {
     projects: ProjectWithDataBuffer[]
 }
 
-type Options = "PROJECT" | "EXPERIMENT"
+type EntryTypeOptions = "PROJECT" | "EXPERIMENT"
 
-export const CreateProjectDialog = ({ parentProjectId, setProjects, projects, setOpen }: Props) => {
-    const [file, setFile] = useState<File>()
-    const [type, setType] = useState<Options>()
+
+interface EntryFormProps {
+    type: EntryTypeOptions
+    parentProjectId?: string
+    // this needs to be passed up to the project stack to render the newly added project or experiment
+    setProjects: Dispatch<SetStateAction<ProjectWithDataBuffer[]>>
+    setOpen: Dispatch<SetStateAction<boolean>>
+    projects: ProjectWithDataBuffer[]
+}
+const EntryForm = ({ type, parentProjectId, setProjects, projects, setOpen }: EntryFormProps
+) => {
     const [projectName, setProjectName] = useState('')
+    const [file, setFile] = useState<File>()
 
-    const handleTypeToggle = (_: React.MouseEvent<HTMLElement>, newInput: Options | null) => {
-        if (newInput !== null) {
-            setType(newInput)
-        }
+    const handleClearFile = (event: SyntheticEvent) => {
+        event.preventDefault()
+        setFile(undefined)
     }
 
     const handleNameOnChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -32,13 +40,12 @@ export const CreateProjectDialog = ({ parentProjectId, setProjects, projects, se
             setFile(() => files[0])
         }
     }
-
-    const handleClearFile = (event: SyntheticEvent) => {
+    //TODO: route to experiments or projects
+    const handleSubmitExperiment = async (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault()
-        setFile(undefined)
+        console.log('submitted expt')
     }
-
-    const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmitProject = async (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault()
         const url = 'http://localhost:3000/projects/'
         const formData = new FormData()
@@ -78,28 +85,15 @@ export const CreateProjectDialog = ({ parentProjectId, setProjects, projects, se
 
     return (
         <>
-            <form onSubmit={handleSubmit}>
-                <ToggleButtonGroup
-                    value={type}
-                    exclusive
-                    onChange={handleTypeToggle}
-                    aria-label="project-or-experiment"
-                >
-                    <ToggleButton value="PROJECT" aria-label="Project">
-                        PROJECT
-                    </ToggleButton>
-                    <ToggleButton value="EXPERIMENT" aria-label="Experiment">
-                        EXPERIMENT
-                    </ToggleButton>
-                </ToggleButtonGroup>
+            <form onSubmit={type === "EXPERIMENT" ? handleSubmitExperiment : handleSubmitProject}>
                 <DialogTitle>
                     Create a new {type === "EXPERIMENT" ? "experiment" : "project"}
                 </DialogTitle>
                 <DialogContent>
-                    <TextField label="Project name"
+                    <TextField label={`${type === "EXPERIMENT" ? "Experiment" : "Project"} name`}
                         autoFocus
                         margin="normal"
-                        id="project-name"
+                        id={`${type}-name`}
                         fullWidth
                         variant="standard"
                         onChange={(event) => {
@@ -111,18 +105,56 @@ export const CreateProjectDialog = ({ parentProjectId, setProjects, projects, se
                                 onClick={handleClearFile}>
                                 Clear attachment
                             </Button>
-                            : 'Attach reaction scheme'}
+                            :
+                            'Attach reaction scheme or image'}
                         <input type="file"
                             hidden
                             onChange={handleFileUploadChange}
                         />
                     </Button>
-                    <>{file}</>
+                    <>{file?.name}</>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" type="submit">Create project</Button>
+                    <Button variant="outlined" type="submit">Create {type === "EXPERIMENT" ? "Experiment" : "Project"}</Button>
                 </DialogActions>
             </form>
+        </>
+    )
+
+}
+
+export const CreateEntryDialog = ({ parentProjectId, setProjects, projects, setOpen }: Props) => {
+    const [type, setType] = useState<EntryTypeOptions>("PROJECT")
+
+    const handleTypeToggle = (_: React.MouseEvent<HTMLElement>, newInput: EntryTypeOptions | null) => {
+        if (newInput !== null) {
+            setType(newInput)
+        }
+    }
+
+
+    return (
+        <>
+            <ToggleButtonGroup
+                value={type}
+                exclusive
+                onChange={handleTypeToggle}
+                aria-label="project-or-experiment"
+            >
+                <ToggleButton value="PROJECT" aria-label="Project">
+                    PROJECT
+                </ToggleButton>
+                <ToggleButton value="EXPERIMENT" aria-label="Experiment">
+                    EXPERIMENT
+                </ToggleButton>
+            </ToggleButtonGroup>
+            <EntryForm
+                type={type}
+                parentProjectId={parentProjectId}
+                setProjects={setProjects}
+                projects={projects}
+                setOpen={setOpen}
+            />
         </>
     )
 } 
