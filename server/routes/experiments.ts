@@ -21,6 +21,7 @@ export interface CreateExperimentHandlerResponse {
   experiment: Experiment;
 }
 
+// TODO: add image to experiment
 export const createExperimentHandler = async (
   req: TypedRequestBody<CreateExperimentHandlerRequest>,
   res: TypedResponse<CreateExperimentHandlerResponse>,
