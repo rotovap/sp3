@@ -5,17 +5,10 @@ import Container from '@mui/material/Paper';
 import { ProjectWithDataBuffer } from '../../../server/routes/projects';
 import { Dispatch, SetStateAction, useState } from 'react'
 import { CreateEntryDialog } from './CreateProjectDialog';
-
-interface Props {
-    projects: ProjectWithDataBuffer[]
-    setProjects: Dispatch<SetStateAction<ProjectWithDataBuffer[]>>
-    title: string
-    pathToProject?: { id: number, name: string }[]
-    parentProjectId?: string
-}
-
+import { Experiment } from '@prisma/client';
 
 type BreadCrumbStackProps = { pathToProject: Props["pathToProject"] }
+
 const BreadCrumbStack = ({ pathToProject }: BreadCrumbStackProps) => {
     if (pathToProject) {
         return (
@@ -37,8 +30,18 @@ const BreadCrumbStack = ({ pathToProject }: BreadCrumbStackProps) => {
     return null
 }
 
+interface Props {
+    projects: ProjectWithDataBuffer[]
+    setProjects: Dispatch<SetStateAction<ProjectWithDataBuffer[]>>
+    title: string
+    pathToProject?: { id: number, name: string }[]
+    parentProjectId?: string
+    experiments?: Experiment[]
+    setExperiments: Dispatch<SetStateAction<Experiment[]>>
+}
 
-export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, setProjects }: Props) => {
+
+export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, setProjects, setExperiments, experiments }: Props) => {
     const [open, setOpen] = useState(false)
 
     const openCreateProjectDialog = () => {
@@ -68,7 +71,7 @@ export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, 
                 <Stack spacing={10} marginRight={2}>
                 </Stack>
                 <Stack spacing={1} sx={{ width: '50%' }}>
-                    {projects.length > 0 ? projects.map((i, idx) => {
+                    {projects.map((i, idx) => {
                         return (
                             <ButtonBase key={idx} component={Link} to={`/projects/${i.id}`} >
                                 <Container variant="outlined" sx={{ flexGrow: 1, padding: 2 }}>
@@ -88,10 +91,37 @@ export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, 
                             </ButtonBase>
                         )
                     })
-                        :
+                    }
+                    {experiments
+                        ? experiments.map((i, idx) => {
+                            return (
+                                <ButtonBase key={idx} component={Link} to={`/experiments/${i.id}`} >
+                                    <Container variant="outlined" sx={{ flexGrow: 1, padding: 2 }}>
+                                        <Stack direction="row" spacing={10}>
+                                            <Stack spacing={2}>
+                                                <Stack>
+                                                    {i.name}
+                                                </Stack>
+                                                {/*<Stack>Another info</Stack>*/}
+                                            </Stack>
+                                            <Stack>
+                                                Reaction scheme can go here. Make experiments a different style
+                                            </Stack>
+                                        </Stack>
+                                    </Container>
+                                </ButtonBase>
+
+                            )
+
+                        })
+                        : null
+                    }
+                    {projects.length === 0 && experiments?.length === 0
+                        ?
                         <Container variant="outlined" sx={{ flexGrow: 1, padding: 2 }}>
                             No projects or experiments yet
                         </Container>
+                        : null
                     }
                 </Stack>
             </Stack >
@@ -101,6 +131,8 @@ export const ProjectStack = ({ parentProjectId, title, projects, pathToProject, 
                     setProjects={setProjects}
                     setOpen={setOpen}
                     projects={projects}
+                    setExperiments={setExperiments}
+                    experiments={experiments}
                 />
             </Dialog>
         </>
