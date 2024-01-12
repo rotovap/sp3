@@ -1,12 +1,13 @@
-import { Button, Card, CardContent, Divider, Stack, Typography } from "@mui/material"
+import { Button, Stack, Typography } from "@mui/material"
 import { ReagentTable } from "../components/ReagentTable"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { GetExperimentByIdHandlerResponse } from "../../../server/routes/experiments"
 
 export const ExperimentPage = () => {
     let { id } = useParams()
     const [title, setTitle] = useState<string>()
+    const [parentId, setParentId] = useState<number>()
 
     useEffect(() => {
         const getExperiment = async () => {
@@ -14,6 +15,7 @@ export const ExperimentPage = () => {
             const result: GetExperimentByIdHandlerResponse = await response.json()
             if (result.experiment) {
                 setTitle(result.experiment.name)
+                setParentId(result.experiment.parentId)
             }
         }
 
@@ -21,23 +23,21 @@ export const ExperimentPage = () => {
     }, [])
     return (
         <>
-            <Stack direction="row" padding={2}>
-                <Card variant="outlined">
-                    <CardContent>
-                        <Typography variant="h5" textAlign="center">{title}</Typography>
-                    </CardContent>
-                    <Divider />
+            <Stack padding={2} spacing={1} sx={{ width: '100%' }}>
+                <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
                     <Stack>
-                        <Button variant="outlined">
-                            Back to project
+                        <Button variant="outlined"
+                            component={Link}
+                            to={`/projects/${parentId}`}>
+                            Back
                         </Button>
                     </Stack>
-                </Card >
-                <Stack spacing={10} marginRight={2}>
-                </Stack>
+                    <Stack sx={{ width: '90%' }}>
+                        <Typography variant="h5" textAlign="center">{title}</Typography>
+                    </Stack>
+                </Stack >
                 <ReagentTable />
-
-            </Stack >
+            </Stack>
         </>
     )
 }
