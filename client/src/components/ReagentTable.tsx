@@ -1,9 +1,12 @@
 import { useState } from "react"
 import { AddReagentDialog } from "./AddReagentDialog"
-import { Button, Dialog } from "@mui/material"
+import { Button, Dialog, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { ExperimentWithReagents } from "../../../server/routes/experiments"
 
-
-export const ReagentTable = () => {
+interface Props {
+    experiment: ExperimentWithReagents
+}
+export const ReagentTable = ({ experiment }: Props) => {
     const [open, setOpen] = useState(false)
 
     const openAddReagentDialog = () => {
@@ -16,10 +19,44 @@ export const ReagentTable = () => {
 
     return (
         <>
-            <Button variant="outlined"
-                onClick={openAddReagentDialog}>
-                ADD REAGENT
-            </Button>
+            <Stack>
+                <TableContainer component={Paper} elevation={0}>
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Reagent #</TableCell>
+                                <TableCell align="right">Name</TableCell>
+                                <TableCell align="right">MW</TableCell>
+                                <TableCell align="right">Density</TableCell>
+                                <TableCell align="right">mmol</TableCell>
+                                <TableCell align="right">Eq</TableCell>
+                                <TableCell align="right">Amount</TableCell>
+
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {experiment.reagents.map((i, idx) => {
+                                const { name, molecularWeight, density } = i.reagent
+                                return (
+                                    <TableRow key={idx}>
+                                        <TableCell>{i.id}</TableCell>
+                                        <TableCell align="right">{name}</TableCell>
+                                        <TableCell align="right">{molecularWeight}</TableCell>
+                                        <TableCell align="right">{density}</TableCell>
+                                        <TableCell align="right">mmol</TableCell>
+                                        <TableCell align="right">{i.equivalents}</TableCell>
+                                        <TableCell align="right">1g</TableCell>
+                                    </TableRow>
+                                )
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <Button variant="outlined"
+                    onClick={openAddReagentDialog}>
+                    ADD REAGENT
+                </Button>
+            </Stack >
             <Dialog
                 open={open}
                 onClose={closeAddReagentDialog}
@@ -28,8 +65,6 @@ export const ReagentTable = () => {
             >
                 <AddReagentDialog setOpen={setOpen} />
             </Dialog>
-
-
         </>
 
     )
