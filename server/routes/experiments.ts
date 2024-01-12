@@ -96,8 +96,11 @@ export interface GetExperimentByIdHandlerRequest {
   id: string;
 }
 
+export type ExperimentWithReagents = Prisma.ExperimentGetPayload<{
+  include: { reagents: { include: { reagent: true } } };
+}>;
 export interface GetExperimentByIdHandlerResponse {
-  experiment: Experiment | null;
+  experiment: ExperimentWithReagents | null;
 }
 
 export const getExperimentByIdHandler = async (
@@ -107,6 +110,7 @@ export const getExperimentByIdHandler = async (
   try {
     const result = await prisma.experiment.findUnique({
       where: { id: Number(req.params.id) },
+      include: { reagents: { include: { reagent: true } } },
     });
     return res.json({ experiment: result });
   } catch (e) {

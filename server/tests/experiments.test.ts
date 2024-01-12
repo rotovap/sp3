@@ -17,6 +17,7 @@ import {
   AssignReagentToExperimentHandlerRequest,
   AssignReagentToExperimentHandlerResponse,
   CreateExperimentHandlerRequest,
+  GetExperimentByIdHandlerResponse,
 } from "../routes/experiments";
 import supertest from "supertest";
 
@@ -147,11 +148,26 @@ describe("experiments routes", () => {
   describe("GET /:id", () => {
     test("returns an experiment if found", async () => {
       const result = await supertest(server).get("/experiments/1");
-      const expectedResult = {
+      const expectedResult: GetExperimentByIdHandlerResponse = {
         experiment: {
           parentId: 4,
           name: "01012024-suzuki coupling",
           id: 1,
+          reagents: [
+            {
+              id: 1,
+              experimentId: 1,
+              equivalents: 1,
+              reactionSchemeLocation: "ABOVE_ARROW",
+              reagentId: 2,
+              reagent: {
+                density: 0.6,
+                id: 2,
+                molecularWeight: 58.12,
+                name: "butane",
+              },
+            },
+          ],
         },
       };
 
