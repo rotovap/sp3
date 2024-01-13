@@ -91,11 +91,14 @@ const seedProjects = async () => {
 
 const seedExperiments = async () => {
   await prisma.project.findFirst({ where: { name: "step 1 - aryl coupling" } });
-  await prisma.experiment.create({
-    data: {
-      parentId: EGFR2ID,
-      name: "01012024-suzuki coupling",
-    },
+  await prisma.experiment.createMany({
+    data: [
+      {
+        parentId: EGFR2ID,
+        name: "01012024-random reaction",
+      },
+      { parentId: EGFR2ID, name: "01012024-suzuki coupling" },
+    ],
   });
 };
 
@@ -106,7 +109,8 @@ const seedReagents = async () => {
         VALUES
         ('ethanol', 'CCO', 46.07, 0.79),
         ('butane', 'CCCC', 58.12, 0.6),
-        ('thf', 'C1CCOC1', 72.11, 0.888)
+        ('thf', 'C1CCOC1', 72.11, 0.888),
+        ('diethyl(3-pyridyl)borane', 'CCB(CC)c1cccnc1', 147.03, NULL)
 `;
 };
 
@@ -123,6 +127,12 @@ const seedAssignReagentToExperiments = async () => {
         reagentId: 3,
         experimentId: 1,
         reactionSchemeLocation: "BELOW_ARROW",
+        equivalents: 1,
+      },
+      {
+        reagentId: 4,
+        experimentId: 2,
+        reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
       },
     ],
