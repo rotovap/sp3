@@ -146,7 +146,7 @@ describe("experiments routes", () => {
   });
 
   describe("GET /:id", () => {
-    test("returns an experiment if found", async () => {
+    test.only("returns an experiment if found", async () => {
       const result = await supertest(server).get("/experiments/1");
       const expectedResult: GetExperimentByIdHandlerResponse = {
         experiment: {
@@ -165,6 +165,21 @@ describe("experiments routes", () => {
                 id: 2,
                 molecularWeight: 58.12,
                 name: "butane",
+                canonicalSMILES: "CCCC",
+              },
+            },
+            {
+              id: 2,
+              experimentId: 1,
+              equivalents: 1,
+              reactionSchemeLocation: "BELOW_ARROW",
+              reagentId: 3,
+              reagent: {
+                density: 0.888,
+                id: 2,
+                molecularWeight: 72.11,
+                name: "thf",
+                canonicalSMILES: "C1CCOC1",
               },
             },
           ],

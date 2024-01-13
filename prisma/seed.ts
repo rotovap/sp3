@@ -105,7 +105,8 @@ const seedReagents = async () => {
         (name, "canonicalSMILES", "molecularWeight", density)
         VALUES
         ('ethanol', 'CCO', 46.07, 0.79),
-        ('butane', 'CCCC', 58.12, 0.6)
+        ('butane', 'CCCC', 58.12, 0.6),
+        ('thf', 'C1CCOC1', 72.11, 0.888)
 `;
 };
 
@@ -116,6 +117,12 @@ const seedAssignReagentToExperiments = async () => {
         reagentId: 2,
         experimentId: 1,
         reactionSchemeLocation: "ABOVE_ARROW",
+        equivalents: 1,
+      },
+      {
+        reagentId: 3,
+        experimentId: 1,
+        reactionSchemeLocation: "BELOW_ARROW",
         equivalents: 1,
       },
     ],

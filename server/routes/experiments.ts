@@ -4,6 +4,7 @@ import {
   ReactionSchemeLocation,
   ExperimentReagent,
   Prisma,
+  Reagent,
 } from "@prisma/client";
 import { Router } from "express";
 import { TypedRequestBody, TypedResponse } from "../types";
@@ -96,11 +97,30 @@ export interface GetExperimentByIdHandlerRequest {
   id: string;
 }
 
-export type ExperimentWithReagents = Prisma.ExperimentGetPayload<{
-  include: { reagents: { include: { reagent: true } } };
-}>;
+type ReagentsInExperiment = {
+  reagents: (ExperimentReagent & {
+    reagent: Reagent & { canonicalSMILES: string };
+  })[];
+};
+export type ExperimentWithReagents = Experiment & ReagentsInExperiment;
 export interface GetExperimentByIdHandlerResponse {
   experiment: ExperimentWithReagents | null;
+}
+
+interface RawExperimentQueryResult {
+  id: number;
+  name: string;
+  parentId: number;
+  erId: number;
+  erExperimentId: number;
+  reactionSchemeLocation: ReactionSchemeLocation;
+  erReagentId: number;
+  equivalents: number;
+  rId: number;
+  rName: string;
+  canonicalSMILES: string;
+  density: number;
+  molecularWeight: number;
 }
 
 export const getExperimentByIdHandler = async (
@@ -108,10 +128,57 @@ export const getExperimentByIdHandler = async (
   res: TypedResponse<GetExperimentByIdHandlerResponse>,
 ) => {
   try {
-    const result = await prisma.experiment.findUnique({
-      where: { id: Number(req.params.id) },
-      include: { reagents: { include: { reagent: true } } },
-    });
+    // considered writing a separate handler to get the smiles of reagents,
+    // in order to do the bulk of the query in prisma, and use its type
+    // generation
+    const rawResult = await prisma.$queryRaw<RawExperimentQueryResult[]>`
+        SELECT e.id,
+            e.name,
+            e."parentId",
+            er.id AS "erId", 
+            er."experimentId" AS "erExperimentId",
+            er."reactionSchemeLocation",
+            er."reagentId" AS "erReagentId",
+            er.equivalents,
+            r.id AS "rId",
+            r.name AS "rName",
+            r."canonicalSMILES"::text,
+            r.density,
+            r."molecularWeight"
+        FROM "Experiment" e
+        INNER JOIN "ExperimentReagent" er 
+        ON e.id=er."experimentId"
+        INNER JOIN "Reagent" r
+        ON r.id=er."reagentId"
+        WHERE e.id=${Number(req.params.id)}
+    `;
+    console.log(rawResult);
+
+    const result = {
+      id: rawResult[0].id,
+      name: rawResult[0].name,
+      parentId: rawResult[0].parentId,
+      reagents: rawResult.map((i) => {
+        // each of these is a row from "ExperimentReagent"
+        return {
+          id: i.erId,
+          experimentId: i.erExperimentId,
+          equivalents: i.equivalents,
+          reactionSchemeLocation: i.reactionSchemeLocation,
+          reagentId: i.rId,
+          reagent: {
+            id: i.rId,
+            density: i.density,
+            molecularWeight: i.molecularWeight,
+            name: i.rName,
+            canonicalSMILES: i.canonicalSMILES,
+          },
+        };
+      }),
+    };
+
+    // TODO: get the canonical smiles of the reagent
+    // need a raw query
     return res.json({ experiment: result });
   } catch (e) {
     return res.status(500).send(JSON.stringify(`Error: ${e}`));
