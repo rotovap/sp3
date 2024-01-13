@@ -3,6 +3,7 @@ import { ReagentTable } from "../components/ReagentTable"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { ExperimentWithReagents, GetExperimentByIdHandlerResponse } from "../../../server/routes/experiments"
+import { ReactionScheme } from "../components/ReactionScheme"
 
 interface TitleBarProps {
     experiment: ExperimentWithReagents
@@ -40,11 +41,13 @@ export const ExperimentPage = () => {
 
         getExperiment()
     }, [])
+
     return (
         <>
             {experiment ?
                 <Stack padding={2} spacing={1} sx={{ width: '100%' }}>
                     <TitleBar experiment={experiment} />
+                    <ReactionScheme experiment={experiment} />
                     <ReagentTable experiment={experiment} />
                 </Stack>
                 : null}
