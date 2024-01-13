@@ -47,7 +47,7 @@ describe("experiments routes", () => {
       const result = await supertest(server).post("/experiments").send(payload);
       const expectedResult = {
         experiment: {
-          id: 2,
+          id: 3,
           name: "test experiment",
           parentId: 1,
         },
@@ -85,7 +85,7 @@ describe("experiments routes", () => {
       const expectedResult = {
         experiment: {
           id: 1,
-          name: "01012024-suzuki coupling",
+          name: "01012024-random reaction",
           parentId: 4,
           reagents: [
             {
@@ -97,6 +97,13 @@ describe("experiments routes", () => {
             },
             {
               id: 2,
+              reagentId: 3,
+              reactionSchemeLocation: ReactionSchemeLocation.BELOW_ARROW,
+              experimentId: 1,
+              equivalents: 1,
+            },
+            {
+              id: 3,
               reagentId: 1,
               reactionSchemeLocation: ReactionSchemeLocation.LEFT_SIDE,
               experimentId: 1,
@@ -146,12 +153,12 @@ describe("experiments routes", () => {
   });
 
   describe("GET /:id", () => {
-    test.only("returns an experiment if found", async () => {
+    test("returns an experiment if found", async () => {
       const result = await supertest(server).get("/experiments/1");
       const expectedResult: GetExperimentByIdHandlerResponse = {
         experiment: {
           parentId: 4,
-          name: "01012024-suzuki coupling",
+          name: "01012024-random reaction",
           id: 1,
           reagents: [
             {
@@ -176,7 +183,7 @@ describe("experiments routes", () => {
               reagentId: 3,
               reagent: {
                 density: 0.888,
-                id: 2,
+                id: 3,
                 molecularWeight: 72.11,
                 name: "thf",
                 canonicalSMILES: "C1CCOC1",

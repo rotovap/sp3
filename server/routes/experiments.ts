@@ -152,34 +152,33 @@ export const getExperimentByIdHandler = async (
         ON r.id=er."reagentId"
         WHERE e.id=${Number(req.params.id)}
     `;
-    console.log(rawResult);
 
-    const result = {
-      id: rawResult[0].id,
-      name: rawResult[0].name,
-      parentId: rawResult[0].parentId,
-      reagents: rawResult.map((i) => {
-        // each of these is a row from "ExperimentReagent"
-        return {
-          id: i.erId,
-          experimentId: i.erExperimentId,
-          equivalents: i.equivalents,
-          reactionSchemeLocation: i.reactionSchemeLocation,
-          reagentId: i.rId,
-          reagent: {
-            id: i.rId,
-            density: i.density,
-            molecularWeight: i.molecularWeight,
-            name: i.rName,
-            canonicalSMILES: i.canonicalSMILES,
-          },
-        };
-      }),
-    };
-
-    // TODO: get the canonical smiles of the reagent
-    // need a raw query
-    return res.json({ experiment: result });
+    if (rawResult.length > 0) {
+      const result = {
+        id: rawResult[0].id,
+        name: rawResult[0].name,
+        parentId: rawResult[0].parentId,
+        reagents: rawResult.map((i) => {
+          // each of these is a row from "ExperimentReagent"
+          return {
+            id: i.erId,
+            experimentId: i.erExperimentId,
+            equivalents: i.equivalents,
+            reactionSchemeLocation: i.reactionSchemeLocation,
+            reagentId: i.rId,
+            reagent: {
+              id: i.rId,
+              density: i.density,
+              molecularWeight: i.molecularWeight,
+              name: i.rName,
+              canonicalSMILES: i.canonicalSMILES,
+            },
+          };
+        }),
+      };
+      return res.json({ experiment: result });
+    }
+    return res.json({ experiment: null });
   } catch (e) {
     return res.status(500).send(JSON.stringify(`Error: ${e}`));
   }
