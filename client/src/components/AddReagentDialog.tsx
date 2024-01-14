@@ -112,7 +112,7 @@ const NameInputForm = ({ setReagentName, setCanonicalSMILES, setMolecularWeightS
                                     alignItems="center"
                                     justifyContent="center"
                                 >
-                                    <Typography variant="body1">
+                                    <Typography component={'span'} variant="body1">
                                         Molecule name
                                     </Typography>
                                     <InfoIcon />
@@ -309,7 +309,7 @@ const DensityInputForm = ({ setDensity, setDensityFormValid, densityFoundInPubCh
                             justifyContent="center"
                         >
 
-                            <Typography variant="body1">
+                            <Typography component={'span'} variant="body1">
                                 Density (g/mL)
                             </Typography>
                             <InfoIcon />
@@ -499,7 +499,7 @@ export const AddReagentDialog = ({ setOpen }: AddReagentDialogProps) => {
             </DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    <Typography variant="body2">
+                    <Typography component={'span'} variant="body2">
                         If the molecule has a well known name, try search for it on PubChem and automatically get the SMILES and molecular weight.
                         Otherwise, you can manually enter the values you need for your reagent.
                     </Typography>
