@@ -97,12 +97,13 @@ export interface GetExperimentByIdHandlerRequest {
   id: string;
 }
 
-type ReagentsInExperiment = {
-  reagents: (ExperimentReagent & {
-    reagent: Reagent & { canonicalSMILES: string };
-  })[];
+export type ReagentWithSMILES = Reagent & { canonicalSMILES: string };
+export type ReagentInExperiment = ExperimentReagent & {
+  reagent: ReagentWithSMILES;
 };
-export type ExperimentWithReagents = Experiment & ReagentsInExperiment;
+export type ExperimentWithReagents = Experiment & {
+  reagents: ReagentInExperiment[];
+};
 export interface GetExperimentByIdHandlerResponse {
   experiment: ExperimentWithReagents | null;
 }
