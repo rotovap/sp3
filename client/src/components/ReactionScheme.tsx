@@ -31,7 +31,7 @@ const LeftAndRightSide = ({ reagent, idx, lengthOfReagents }: LeftAndRightSidePr
                     alignItems="center"
                     justifyContent="center"
                 >
-                    <Stack padding={3}>
+                    <Stack padding={3} direction="column" textAlign="center">
                         <MoleculeStructure
                             id="molecule-structure"
                             structure={reagent.canonicalSMILES}
@@ -39,6 +39,10 @@ const LeftAndRightSide = ({ reagent, idx, lengthOfReagents }: LeftAndRightSidePr
                             height={MOL_STRUCT_DIM}
                             svgMode
                         />
+                        <Typography variant="caption" display="block" gutterBottom>
+                            {reagent.id}
+                        </Typography>
+
                     </Stack>
                     {idx < lengthOfReagents - 1 ?
                         <Stack>

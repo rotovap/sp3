@@ -24,7 +24,7 @@ export const ReagentTable = ({ experiment }: Props) => {
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Reagent #</TableCell>
+                                <TableCell>ID</TableCell>
                                 <TableCell align="right">Name</TableCell>
                                 <TableCell align="right">MW</TableCell>
                                 <TableCell align="right">Density</TableCell>
@@ -36,18 +36,20 @@ export const ReagentTable = ({ experiment }: Props) => {
                         </TableHead>
                         <TableBody>
                             {experiment.reagents.map((i, idx) => {
-                                const { name, molecularWeight, density } = i.reagent
-                                return (
-                                    <TableRow key={idx}>
-                                        <TableCell>{i.id}</TableCell>
-                                        <TableCell align="right">{name}</TableCell>
-                                        <TableCell align="right">{molecularWeight}</TableCell>
-                                        <TableCell align="right">{density}</TableCell>
-                                        <TableCell align="right">mmol</TableCell>
-                                        <TableCell align="right">{i.equivalents}</TableCell>
-                                        <TableCell align="right">1g</TableCell>
-                                    </TableRow>
-                                )
+                                if (i.reactionSchemeLocation !== "RIGHT_SIDE") {
+                                    const { name, molecularWeight, density } = i.reagent
+                                    return (
+                                        <TableRow key={idx}>
+                                            <TableCell>{i.reagent.id}</TableCell>
+                                            <TableCell align="right">{name}</TableCell>
+                                            <TableCell align="right">{molecularWeight}</TableCell>
+                                            <TableCell align="right">{density}</TableCell>
+                                            <TableCell align="right">mmol</TableCell>
+                                            <TableCell align="right">{i.equivalents}</TableCell>
+                                            <TableCell align="right">1g</TableCell>
+                                        </TableRow>
+                                    )
+                                }
                             })}
                         </TableBody>
                     </Table>
