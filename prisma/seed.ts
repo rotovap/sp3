@@ -98,6 +98,7 @@ const seedExperiments = async () => {
         name: "01012024-random reaction",
       },
       { parentId: EGFR2ID, name: "01012024-suzuki coupling" },
+      { parentId: EGFR2ID, name: "An experiment with no reagents yet" },
     ],
   });
 };

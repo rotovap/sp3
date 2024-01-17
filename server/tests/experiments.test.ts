@@ -47,7 +47,7 @@ describe("experiments routes", () => {
       const result = await supertest(server).post("/experiments").send(payload);
       const expectedResult = {
         experiment: {
-          id: 3,
+          id: 4,
           name: "test experiment",
           parentId: 1,
         },
@@ -103,7 +103,7 @@ describe("experiments routes", () => {
               equivalents: 1,
             },
             {
-              id: 3,
+              id: 9,
               reagentId: 1,
               reactionSchemeLocation: ReactionSchemeLocation.LEFT_SIDE,
               experimentId: 1,
@@ -200,6 +200,20 @@ describe("experiments routes", () => {
       const result = await supertest(server).get("/experiments/100");
       const expectedResult = {
         experiment: null,
+      };
+
+      expect(result.body).toStrictEqual(expectedResult);
+    });
+
+    test("returns experiment if there are no reagents added yet -- make sure left outer join works", async () => {
+      const result = await supertest(server).get("/experiments/3");
+      const expectedResult = {
+        experiment: {
+          parentId: 4,
+          name: "An experiment with no reagents yet",
+          id: 3,
+          reagents: [],
+        },
       };
 
       expect(result.body).toStrictEqual(expectedResult);

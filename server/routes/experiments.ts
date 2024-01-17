@@ -147,9 +147,9 @@ export const getExperimentByIdHandler = async (
             r.density,
             r."molecularWeight"
         FROM "Experiment" e
-        INNER JOIN "ExperimentReagent" er 
+        LEFT OUTER JOIN "ExperimentReagent" er 
         ON e.id=er."experimentId"
-        INNER JOIN "Reagent" r
+        LEFT OUTER JOIN "Reagent" r
         ON r.id=er."reagentId"
         WHERE e.id=${Number(req.params.id)}
     `;
@@ -159,23 +159,27 @@ export const getExperimentByIdHandler = async (
         id: rawResult[0].id,
         name: rawResult[0].name,
         parentId: rawResult[0].parentId,
-        reagents: rawResult.map((i) => {
-          // each of these is a row from "ExperimentReagent"
-          return {
-            id: i.erId,
-            experimentId: i.erExperimentId,
-            equivalents: i.equivalents,
-            reactionSchemeLocation: i.reactionSchemeLocation,
-            reagentId: i.rId,
-            reagent: {
-              id: i.rId,
-              density: i.density,
-              molecularWeight: i.molecularWeight,
-              name: i.rName,
-              canonicalSMILES: i.canonicalSMILES,
-            },
-          };
-        }),
+        reagents: rawResult
+          .filter((i) => i.erId !== null)
+          .map((i) => {
+            // each of these is a row from "ExperimentReagent"
+            {
+              return {
+                id: i.erId,
+                experimentId: i.erExperimentId,
+                equivalents: i.equivalents,
+                reactionSchemeLocation: i.reactionSchemeLocation,
+                reagentId: i.rId,
+                reagent: {
+                  id: i.rId,
+                  density: i.density,
+                  molecularWeight: i.molecularWeight,
+                  name: i.rName,
+                  canonicalSMILES: i.canonicalSMILES,
+                },
+              };
+            }
+          }),
       };
       return res.json({ experiment: result });
     }

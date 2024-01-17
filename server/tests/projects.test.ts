@@ -111,7 +111,17 @@ describe("projects handlers", () => {
               {
                 id: 1,
                 parentId: 4,
+                name: "01012024-random reaction",
+              },
+              {
+                id: 2,
                 name: "01012024-suzuki coupling",
+                parentId: 4,
+              },
+              {
+                id: 3,
+                parentId: 4,
+                name: "An experiment with no reagents yet",
               },
             ],
             children: [
