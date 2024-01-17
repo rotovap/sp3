@@ -400,7 +400,7 @@ const ReactionSchemeLocationForm = ({ setReactionSchemeLocation }: ReactionSchem
             <FormControlLabel value={"LEFT_SIDE"} control={<Radio />} label="Left side" />
             <FormControlLabel value={"ABOVE_ARROW"} control={<Radio />} label="Above arrow" />
             <FormControlLabel value={"BELOW_ARROW"} control={<Radio />} label="Below arrow" />
-            <FormControlLabel value={"RIGHT_SIDE"} control={<Radio />} label="Right side" />
+            <FormControlLabel value={"RIGHT_SIDE"} control={<Radio />} label="Product" />
         </RadioGroup>
     </FormControl>)
 }
