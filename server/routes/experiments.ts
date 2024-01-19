@@ -46,11 +46,59 @@ export interface AssignReagentToExperimentHandlerRequest {
   reagentId: string;
   reactionSchemeLocation: ReactionSchemeLocation;
   equivalents: number;
+  limitingReagent: boolean;
 }
 
 export interface AssignReagentToExperimentHandlerResponse {
   experiment: Experiment & { reagents: ExperimentReagent[] };
 }
+
+type FullExperimentReagent = Prisma.ExperimentReagentGetPayload<{
+  include: { experiment: { include: { reagents: true } } };
+}>;
+// move the transaction out of the handler because typescript seems to take the
+// return type of the handler as the return type of the transaction, which is
+// incorrect
+const _assignExperimentReagent = async ({
+  experimentId,
+  reagentId,
+  reactionSchemeLocation,
+  limitingReagent,
+  equivalents,
+}: AssignReagentToExperimentHandlerRequest): Promise<FullExperimentReagent> => {
+  const txRes = await prisma.$transaction(async (tx) => {
+    // should only be one limiting reagent in the experiment
+    const reagents = await tx.experimentReagent.findMany({
+      where: {
+        experimentId: Number(experimentId),
+      },
+      include: { reagent: true },
+    });
+
+    const existingLimitingReagent = reagents.find(
+      (i) => i.limitingReagent === true,
+    );
+    if (existingLimitingReagent) {
+      throw new Error(
+        `Experiment ${experimentId} already has a limiting reagent: ${existingLimitingReagent.reagent.name}`,
+      );
+    }
+
+    const result = await tx.experimentReagent.create({
+      data: {
+        reagentId: Number(reagentId),
+        experimentId: Number(experimentId),
+        reactionSchemeLocation: reactionSchemeLocation,
+        equivalents: equivalents,
+        limitingReagent: limitingReagent,
+      },
+      include: { experiment: { include: { reagents: true } } },
+    });
+
+    return result;
+  });
+  return txRes;
+};
 
 // assign reagent to the experiment
 // reagent needs to already be in the DB
@@ -58,20 +106,23 @@ export const assignReagentToExperiment = async (
   req: TypedRequestBody<AssignReagentToExperimentHandlerRequest>,
   res: TypedResponse<AssignReagentToExperimentHandlerResponse>,
 ) => {
-  const { experimentId, reagentId, reactionSchemeLocation, equivalents } =
-    req.body;
-  try {
-    const result = await prisma.experimentReagent.create({
-      data: {
-        reagentId: Number(reagentId),
-        experimentId: Number(experimentId),
-        reactionSchemeLocation: reactionSchemeLocation,
-        equivalents: equivalents,
-      },
-      include: { experiment: { include: { reagents: true } } },
-    });
+  const {
+    experimentId,
+    reagentId,
+    reactionSchemeLocation,
+    equivalents,
+    limitingReagent,
+  } = req.body;
 
-    res.json({ experiment: result.experiment });
+  try {
+    const txRes = await _assignExperimentReagent({
+      experimentId: experimentId,
+      reagentId: reagentId,
+      reactionSchemeLocation: reactionSchemeLocation,
+      equivalents: equivalents,
+      limitingReagent: limitingReagent,
+    });
+    return res.json({ experiment: txRes.experiment });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       if (e.code === "P2003") {
@@ -89,7 +140,7 @@ export const assignReagentToExperiment = async (
           );
       }
     }
-    return res.status(500).send(JSON.stringify(`Error: ${e}`));
+    return res.status(500).send(JSON.stringify(`${e}`));
   }
 };
 

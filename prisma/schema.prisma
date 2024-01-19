@@ -38,6 +38,7 @@ model ExperimentReagent {
   reagentId              Int
   reagent                Reagent                @relation(fields: [reagentId], references: [id])
   equivalents            Float
+  limitingReagent        Boolean
 
   @@unique([experimentId, reagentId])
 }

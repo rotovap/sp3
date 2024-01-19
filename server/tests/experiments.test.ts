@@ -76,6 +76,7 @@ describe("experiments routes", () => {
         reagentId: "1",
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
+        limitingReagent: true,
       };
 
       const result = await supertest(server)
@@ -93,6 +94,7 @@ describe("experiments routes", () => {
               reagentId: 2,
               reactionSchemeLocation: ReactionSchemeLocation.ABOVE_ARROW,
               experimentId: 1,
+              limitingReagent: false,
               equivalents: 1,
             },
             {
@@ -100,6 +102,7 @@ describe("experiments routes", () => {
               reagentId: 3,
               reactionSchemeLocation: ReactionSchemeLocation.BELOW_ARROW,
               experimentId: 1,
+              limitingReagent: false,
               equivalents: 1,
             },
             {
@@ -108,6 +111,7 @@ describe("experiments routes", () => {
               reactionSchemeLocation: ReactionSchemeLocation.LEFT_SIDE,
               experimentId: 1,
               equivalents: 1,
+              limitingReagent: true,
             },
           ].sort(compareExptReagent),
         },
@@ -129,6 +133,7 @@ describe("experiments routes", () => {
         reagentId: "100",
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
+        limitingReagent: false,
       };
 
       await supertest(server)
@@ -143,12 +148,32 @@ describe("experiments routes", () => {
         reagentId: "2",
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
+        limitingReagent: false,
       };
 
       await supertest(server)
         .post("/experiments/assignReagentToExperiment")
         .send(payload)
         .expect(400);
+    });
+
+    test("throws error if there is already a limiting reagent", async () => {
+      const payload: AssignReagentToExperimentHandlerRequest = {
+        experimentId: "2",
+        reagentId: "2",
+        reactionSchemeLocation: "LEFT_SIDE",
+        equivalents: 1,
+        limitingReagent: true,
+      };
+
+      const res = await supertest(server)
+        .post("/experiments/assignReagentToExperiment")
+        .send(payload);
+
+      expect(res.text).toStrictEqual(
+        '"Error: Experiment 2 already has a limiting reagent: diethyl(3-pyridyl)borane"',
+      );
+      expect(res.status).toBe(500);
     });
   });
 
