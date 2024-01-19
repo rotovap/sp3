@@ -168,6 +168,7 @@ interface RawExperimentQueryResult {
   reactionSchemeLocation: ReactionSchemeLocation;
   erReagentId: number;
   equivalents: number;
+  limitingReagent: boolean;
   rId: number;
   rName: string;
   canonicalSMILES: string;
@@ -192,6 +193,7 @@ export const getExperimentByIdHandler = async (
             er."reactionSchemeLocation",
             er."reagentId" AS "erReagentId",
             er.equivalents,
+            er."limitingReagent",
             r.id AS "rId",
             r.name AS "rName",
             r."canonicalSMILES"::text,
@@ -219,6 +221,7 @@ export const getExperimentByIdHandler = async (
                 id: i.erId,
                 experimentId: i.erExperimentId,
                 equivalents: i.equivalents,
+                limitingReagent: i.limitingReagent,
                 reactionSchemeLocation: i.reactionSchemeLocation,
                 reagentId: i.rId,
                 reagent: {

@@ -190,6 +190,7 @@ describe("experiments routes", () => {
               id: 1,
               experimentId: 1,
               equivalents: 1,
+              limitingReagent: false,
               reactionSchemeLocation: "ABOVE_ARROW",
               reagentId: 2,
               reagent: {
@@ -204,6 +205,7 @@ describe("experiments routes", () => {
               id: 2,
               experimentId: 1,
               equivalents: 1,
+              limitingReagent: false,
               reactionSchemeLocation: "BELOW_ARROW",
               reagentId: 3,
               reagent: {
