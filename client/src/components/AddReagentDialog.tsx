@@ -5,7 +5,7 @@ import { Alert, Autocomplete, Button, DialogContent, DialogContentText, DialogTi
 import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from "react"
 import MoleculeStructure from "./MoleculeStructure/MoleculeStructure"
 import { AddReagentHandlerRequest, AddReagentHandlerResponse, GetReagentHandlerResponse, GetSimilarReagentsByNameHandlerResponse } from "../../../server/routes/reagents"
-import { AssignReagentToExperimentHandlerRequest, AssignReagentToExperimentHandlerResponse } from "../../../server/routes/experiments"
+import { AssignReagentToExperimentHandlerRequest, AssignReagentToExperimentHandlerResponse, ExperimentWithReagents } from "../../../server/routes/experiments"
 
 
 // in the client, @prisma/client is not available because that is in the backend
@@ -351,13 +351,18 @@ const DensityInputForm = ({ setDensity, setDensityFormValid, densityFoundInPubCh
 
 
 interface EquivalentsInputFormProps {
-    handleSetEq: Dispatch<SetStateAction<number | undefined>>
+    handleSetEq: Dispatch<SetStateAction<number | null>>
+    limitingReagentAlreadyAssigned: boolean
 }
-const EquivalentsInputForm = ({ handleSetEq }: EquivalentsInputFormProps) => {
+const EquivalentsInputForm = ({ handleSetEq, limitingReagentAlreadyAssigned }: EquivalentsInputFormProps) => {
     const [eqHelperText, setEqHelperText] = useState<string>('')
+    // if limiting reagent is already assigned, user can specify equivalents
+    // otherwise limiting reagent will be set to 1 eq
+
     return (<TextField
-        label="Equivalents"
+        label={limitingReagentAlreadyAssigned ? "Equivalents" : "Equivalents for limiting reagent will be set to 1"}
         error={eqHelperText === NUMBER_INPUT_ERROR_MSG ? true : false}
+        disabled={limitingReagentAlreadyAssigned ? false : true}
         autoFocus
         margin="normal"
         id="equivalents"
@@ -408,9 +413,10 @@ const ReactionSchemeLocationForm = ({ setReactionSchemeLocation }: ReactionSchem
 
 interface AddReagentDialogProps {
     setOpen: Dispatch<SetStateAction<boolean>>
+    experiment: ExperimentWithReagents
 }
-export const AddReagentDialog = ({ setOpen }: AddReagentDialogProps) => {
-    const [eq, setEq] = useState<number>()
+export const AddReagentDialog = ({ setOpen, experiment }: AddReagentDialogProps) => {
+    const [eq, setEq] = useState<number | null>(null)
     const [reagentName, setReagentName] = useState<string>()
     const [canonicalSMILES, setCanonicalSMILES] = useState<string>()
     // set mw and density as string because populating the value of textfield programatically 
@@ -429,6 +435,8 @@ export const AddReagentDialog = ({ setOpen }: AddReagentDialogProps) => {
     const [snackBarOpen, setSnackBarOpen] = useState<boolean>(false)
     const [successfulAdd, setSuccessfulAdd] = useState<boolean>()
     const [errorMsg, setErrorMsg] = useState<string>()
+
+    const limitingReagentAlreadyAssigned = experiment.reagents.find((i) => i.limitingReagent === true) ? true : false
 
     const saveReagentToBackend = async () => {
         // check if this reagent exists already
@@ -464,9 +472,10 @@ export const AddReagentDialog = ({ setOpen }: AddReagentDialogProps) => {
         if (reactionSchemeLocation && eq) {
             const reagentToAssign: AssignReagentToExperimentHandlerRequest = {
                 reagentId: reagentId.toString(),
-                experimentId: "1",
+                experimentId: experiment.id.toString(),
                 reactionSchemeLocation: reactionSchemeLocation,
                 equivalents: eq,
+                limitingReagent: limitingReagentAlreadyAssigned ? false : true
             }
 
             const assignReagentToExptAPIReq = await fetch(`http://localhost:3000/experiments/assignReagentToExperiment`, {
@@ -477,7 +486,6 @@ export const AddReagentDialog = ({ setOpen }: AddReagentDialogProps) => {
                 body: JSON.stringify(reagentToAssign)
             })
 
-            // console.log(assignReagentToExptAPIReq)
             const assignResponse: AssignReagentToExperimentHandlerResponse = await assignReagentToExptAPIReq.json()
             if (assignReagentToExptAPIReq.status === 200) {
                 setSuccessfulAdd(true)
@@ -485,17 +493,24 @@ export const AddReagentDialog = ({ setOpen }: AddReagentDialogProps) => {
                 if (assignResponse.toString().includes(`Reagent ${reagentId} already assigned to experiment`)) {
                     setErrorMsg(`${reagentName} already assigned to this experiment`)
                 }
+                setErrorMsg(assignResponse.toString())
+
                 setSuccessfulAdd(false)
             }
             setSnackBarOpen(true)
         }
     }
 
-    useEffect(() => { }, [molecularWeightString])
+    useEffect(() => {
+        if (!limitingReagentAlreadyAssigned) {
+            setEq(1)
+        }
+    }, [molecularWeightString])
+
     return (
         <>
             <DialogTitle>
-                Add reagent
+                {limitingReagentAlreadyAssigned ? "Add Reagent" : "Add Limiting Reagent"}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText>
@@ -532,7 +547,7 @@ export const AddReagentDialog = ({ setOpen }: AddReagentDialogProps) => {
                                 density={density}
                             />
                         </Stack>
-                        <EquivalentsInputForm handleSetEq={setEq} />
+                        <EquivalentsInputForm handleSetEq={setEq} limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned} />
                         <ReactionSchemeLocationForm setReactionSchemeLocation={setReactionSchemeLocation} />
                         {
                             (canonicalSMILES || reagentName) && densityFormValid && eq && molecularWeightString && molecularWeightFormValid && reactionSchemeLocation ?

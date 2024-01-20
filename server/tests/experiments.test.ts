@@ -157,7 +157,96 @@ describe("experiments routes", () => {
         .expect(400);
     });
 
-    test("throws error if there is already a limiting reagent", async () => {
+    test("a non limiting reagent can be assigned after a limiting reagent has been assigned", async () => {
+      const payload: AssignReagentToExperimentHandlerRequest = {
+        experimentId: "2",
+        reagentId: "1",
+        reactionSchemeLocation: "ABOVE_ARROW",
+        equivalents: 1,
+        limitingReagent: false,
+      };
+
+      const result = await supertest(server)
+        .post("/experiments/assignReagentToExperiment")
+        .send(payload);
+
+      const expectedResult = {
+        experiment: {
+          id: 2,
+          name: "01012024-suzuki coupling",
+          parentId: 4,
+          reagents: [
+            {
+              equivalents: 1,
+              experimentId: 2,
+              id: 3,
+              limitingReagent: true,
+              reactionSchemeLocation: ReactionSchemeLocation.LEFT_SIDE,
+              reagentId: 4,
+            },
+            {
+              equivalents: 1,
+              experimentId: 2,
+              id: 4,
+              limitingReagent: false,
+              reactionSchemeLocation: ReactionSchemeLocation.LEFT_SIDE,
+              reagentId: 5,
+            },
+            {
+              equivalents: 1,
+              experimentId: 2,
+              id: 5,
+              limitingReagent: false,
+              reactionSchemeLocation: ReactionSchemeLocation.ABOVE_ARROW,
+              reagentId: 6,
+            },
+            {
+              equivalents: 1,
+              experimentId: 2,
+              id: 6,
+              limitingReagent: false,
+              reactionSchemeLocation: ReactionSchemeLocation.BELOW_ARROW,
+              reagentId: 7,
+            },
+            {
+              equivalents: 1,
+              experimentId: 2,
+              id: 7,
+              limitingReagent: false,
+              reactionSchemeLocation: ReactionSchemeLocation.BELOW_ARROW,
+              reagentId: 8,
+            },
+            {
+              equivalents: 1,
+              experimentId: 2,
+              id: 8,
+              limitingReagent: false,
+              reactionSchemeLocation: ReactionSchemeLocation.RIGHT_SIDE,
+              reagentId: 9,
+            },
+            {
+              equivalents: 1,
+              experimentId: 2,
+              id: 9,
+              limitingReagent: false,
+              reactionSchemeLocation: ReactionSchemeLocation.ABOVE_ARROW,
+              reagentId: 1,
+            },
+          ].sort(compareExptReagent),
+        },
+      };
+
+      const resultBody: AssignReagentToExperimentHandlerResponse = result.body;
+      const { reagents, ...rest } = resultBody.experiment;
+
+      reagents.sort(compareExptReagent);
+
+      const sortedResult = { experiment: { ...rest, reagents: reagents } };
+
+      expect(sortedResult).toStrictEqual(expectedResult);
+    });
+
+    test("throws error if there is already a limiting reagent and another one is assigned", async () => {
       const payload: AssignReagentToExperimentHandlerRequest = {
         experimentId: "2",
         reagentId: "2",

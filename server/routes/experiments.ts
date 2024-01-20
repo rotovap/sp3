@@ -78,7 +78,8 @@ const _assignExperimentReagent = async ({
     const existingLimitingReagent = reagents.find(
       (i) => i.limitingReagent === true,
     );
-    if (existingLimitingReagent) {
+
+    if (limitingReagent && existingLimitingReagent) {
       throw new Error(
         `Experiment ${experimentId} already has a limiting reagent: ${existingLimitingReagent.reagent.name}`,
       );
