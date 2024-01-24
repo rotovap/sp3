@@ -18,7 +18,8 @@ export const ReagentTable = ({ experiment }: Props) => {
         setOpen(false)
     }
 
-    // TODO: don't need eqivalents for the product
+
+    // FIX: reagent table doesn't automatically rerender after a reagent is added
     // TODO: maybe try make the assing reagent experiment api happen here in the parent
     // so that the component rerenders and draws the new structure that was added
     // TODO: sort the reagents so that limiting reagent is first, then the left side, then above arrow, then below arrow

@@ -353,16 +353,35 @@ const DensityInputForm = ({ setDensity, setDensityFormValid, densityFoundInPubCh
 interface EquivalentsInputFormProps {
     handleSetEq: Dispatch<SetStateAction<number | null>>
     limitingReagentAlreadyAssigned: boolean
+    enteringProduct: boolean
 }
-const EquivalentsInputForm = ({ handleSetEq, limitingReagentAlreadyAssigned }: EquivalentsInputFormProps) => {
-    const [eqHelperText, setEqHelperText] = useState<string>('')
+const EquivalentsInputForm = ({ handleSetEq, limitingReagentAlreadyAssigned, enteringProduct }: EquivalentsInputFormProps) => {
     // if limiting reagent is already assigned, user can specify equivalents
     // otherwise limiting reagent will be set to 1 eq
+    // if the user is entering the product into the reagent table, that also
+    // will default to 1 eq
+    const [eqHelperText, setEqHelperText] = useState<string>('')
+    const [label, setLabel] = useState<string>('Equivalents')
+    const [disabled, setDisabled] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (!limitingReagentAlreadyAssigned) {
+            setLabel("Equivalents for limiting reagent will be set to 1")
+            setDisabled(true)
+        } else if (enteringProduct) {
+            setLabel("Equivalents for product will be set to 1")
+            setDisabled(true)
+        } else {
+            setLabel('Equivalents')
+            setDisabled(false)
+        }
+
+    }, [enteringProduct, limitingReagentAlreadyAssigned])
 
     return (<TextField
-        label={limitingReagentAlreadyAssigned ? "Equivalents" : "Equivalents for limiting reagent will be set to 1"}
+        label={label}
         error={eqHelperText === NUMBER_INPUT_ERROR_MSG ? true : false}
-        disabled={limitingReagentAlreadyAssigned ? false : true}
+        disabled={disabled}
         autoFocus
         margin="normal"
         id="equivalents"
@@ -435,6 +454,7 @@ export const AddReagentDialog = ({ setOpen, experiment }: AddReagentDialogProps)
     const [snackBarOpen, setSnackBarOpen] = useState<boolean>(false)
     const [successfulAdd, setSuccessfulAdd] = useState<boolean>()
     const [errorMsg, setErrorMsg] = useState<string>()
+    const [enteringProduct, setEnteringProduct] = useState<boolean>(false)
 
     const limitingReagentAlreadyAssigned = experiment.reagents.find((i) => i.limitingReagent === true) ? true : false
 
@@ -505,7 +525,13 @@ export const AddReagentDialog = ({ setOpen, experiment }: AddReagentDialogProps)
         if (!limitingReagentAlreadyAssigned) {
             setEq(1)
         }
-    }, [molecularWeightString])
+        if (reactionSchemeLocation === 'RIGHT_SIDE') {
+            setEnteringProduct(true)
+            setEq(1)
+        } else {
+            setEnteringProduct(false)
+        }
+    }, [molecularWeightString, reactionSchemeLocation])
 
     return (
         <>
@@ -547,7 +573,7 @@ export const AddReagentDialog = ({ setOpen, experiment }: AddReagentDialogProps)
                                 density={density}
                             />
                         </Stack>
-                        <EquivalentsInputForm handleSetEq={setEq} limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned} />
+                        <EquivalentsInputForm handleSetEq={setEq} limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned} enteringProduct={enteringProduct} />
                         <ReactionSchemeLocationForm setReactionSchemeLocation={setReactionSchemeLocation} />
                         {
                             (canonicalSMILES || reagentName) && densityFormValid && eq && molecularWeightString && molecularWeightFormValid && reactionSchemeLocation ?
