@@ -526,10 +526,12 @@ const ReactionSchemeLocationForm = ({
 interface AddReagentDialogProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
   experiment: ExperimentWithReagents;
+  setAddedReagentIds: Dispatch<SetStateAction<number[]>>;
 }
 export const AddReagentDialog = ({
   setOpen,
   experiment,
+  setAddedReagentIds,
 }: AddReagentDialogProps) => {
   const [eq, setEq] = useState<number | null>(null);
   const [reagentName, setReagentName] = useState<string>();
@@ -554,7 +556,7 @@ export const AddReagentDialog = ({
   const [successfulAdd, setSuccessfulAdd] = useState<boolean>();
   const [errorMsg, setErrorMsg] = useState<string>();
   const [enteringProduct, setEnteringProduct] = useState<boolean>(false);
-
+  console.log(experiment);
   const limitingReagentAlreadyAssigned = experiment.reagents.find(
     (i) => i.limitingReagent === true,
   )
@@ -623,6 +625,8 @@ export const AddReagentDialog = ({
         await assignReagentToExptAPIReq.json();
       if (assignReagentToExptAPIReq.status === 200) {
         setSuccessfulAdd(true);
+        const curReagentIds = experiment.reagents.map((i) => i.reagent.id);
+        setAddedReagentIds([...curReagentIds, reagentId]);
       } else {
         if (
           assignResponse

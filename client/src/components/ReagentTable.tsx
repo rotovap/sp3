@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { AddReagentDialog } from "./AddReagentDialog";
 import {
   Button,
@@ -18,8 +18,9 @@ import SpeedIcon from "@mui/icons-material/Speed";
 
 interface Props {
   experiment: ExperimentWithReagents;
+  setAddedReagentIds: Dispatch<SetStateAction<number[]>>;
 }
-export const ReagentTable = ({ experiment }: Props) => {
+export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
   const [open, setOpen] = useState(false);
 
   const openAddReagentDialog = () => {
@@ -30,9 +31,6 @@ export const ReagentTable = ({ experiment }: Props) => {
     setOpen(false);
   };
 
-  // FIX: reagent table doesn't automatically rerender after a reagent is added
-  // TODO: maybe try make the assing reagent experiment api happen here in the parent
-  // so that the component rerenders and draws the new structure that was added
   // TODO: sort the reagents so that limiting reagent is first, then the left side, then above arrow, then below arrow
   return (
     <>
@@ -87,7 +85,11 @@ export const ReagentTable = ({ experiment }: Props) => {
         fullWidth={true}
         maxWidth="xl"
       >
-        <AddReagentDialog experiment={experiment} setOpen={setOpen} />
+        <AddReagentDialog
+          experiment={experiment}
+          setOpen={setOpen}
+          setAddedReagentIds={setAddedReagentIds}
+        />
       </Dialog>
     </>
   );

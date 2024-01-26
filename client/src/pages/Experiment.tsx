@@ -34,6 +34,13 @@ const TitleBar = ({ experiment }: TitleBarProps) => {
 export const ExperimentPage = () => {
   let { id } = useParams();
   const [experiment, setExperiment] = useState<ExperimentWithReagents>();
+  // this state is used to rerender the reagent table after adding a new
+  // reagent. In order to get the table to re-render, a way to trigger
+  // the hook is needed. Just tracking what reagentIds are present and adding
+  // to this array any newly assigned reagents makes the useEffect hook run
+  // again and then refetches the updated experiments and then re-renders the
+  // reagent table
+  const [addedReagentIds, setAddedReagentIds] = useState<number[]>([]);
 
   useEffect(() => {
     const getExperiment = async () => {
@@ -45,7 +52,7 @@ export const ExperimentPage = () => {
     };
 
     getExperiment();
-  }, []);
+  }, [addedReagentIds]);
 
   return (
     <>
@@ -53,7 +60,10 @@ export const ExperimentPage = () => {
         <Stack padding={2} spacing={1} sx={{ width: "100%" }}>
           <TitleBar experiment={experiment} />
           <ReactionScheme experiment={experiment} />
-          <ReagentTable experiment={experiment} />
+          <ReagentTable
+            experiment={experiment}
+            setAddedReagentIds={setAddedReagentIds}
+          />
         </Stack>
       ) : null}
     </>
