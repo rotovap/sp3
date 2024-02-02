@@ -31,7 +31,9 @@ export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
     setOpen(false);
   };
 
-  // TODO: sort the reagents so that limiting reagent is first, then the left side, then above arrow, then below arrow
+  const lr = experiment.reagents.find((i) => i.limitingReagent);
+
+  // TODO calculate mmol
   return (
     <>
       <Stack>
@@ -49,8 +51,32 @@ export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* show limiting reagent first */}
+              {lr ? (
+                <TableRow>
+                  <TableCell>
+                    <Tooltip title="Limiting reagent">
+                      <SpeedIcon fontSize="small" />
+                    </Tooltip>
+                    {lr.reagent.id}
+                  </TableCell>
+                  <TableCell align="right">{lr.reagent.name}</TableCell>
+                  <TableCell align="right">
+                    {lr.reagent.molecularWeight}
+                  </TableCell>
+                  <TableCell align="right">
+                    {lr.reagent.density ?? "--"}
+                  </TableCell>
+                  <TableCell align="right">mmol</TableCell>
+                  <TableCell align="right">{lr.equivalents}</TableCell>
+                  <TableCell align="right">1g</TableCell>
+                </TableRow>
+              ) : null}
               {experiment.reagents.map((i, idx) => {
-                if (i.reactionSchemeLocation !== "RIGHT_SIDE") {
+                if (
+                  i.reactionSchemeLocation !== "RIGHT_SIDE" &&
+                  !i.limitingReagent
+                ) {
                   const { name, molecularWeight, density } = i.reagent;
                   return (
                     <TableRow key={idx}>
