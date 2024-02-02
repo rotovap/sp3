@@ -17,6 +17,8 @@ import {
   Snackbar,
   Stack,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import {
@@ -472,6 +474,87 @@ const EquivalentsInputForm = ({
   );
 };
 
+interface AmountInputFormProps {
+  handleSetAmt: Dispatch<SetStateAction<number | null>>;
+  enteringProduct: boolean;
+}
+const AmountInputForm = ({
+  handleSetAmt,
+  enteringProduct,
+}: AmountInputFormProps) => {
+  const [unit, setUnit] = useState<"g" | "mg" | "mL" | "L">("g");
+  const [disabled, setDisabled] = useState<boolean>(false);
+  const [label, setLabel] = useState<string>("Amount");
+  const [helperText, setHelperText] = useState<string>("");
+
+  const handleUnit = (
+    event: React.MouseEvent<HTMLElement>,
+    unit: string | null,
+  ) => {
+    if (
+      unit !== null &&
+      (unit === "g" || unit === "mg" || unit === "mL" || unit === "L")
+    ) {
+      setUnit(unit);
+    }
+  };
+
+  useEffect(() => {
+    if (enteringProduct) {
+      setLabel("Theoretical yield will be calculated");
+      setDisabled(true);
+    } else {
+      setLabel("Amount");
+      setDisabled(false);
+    }
+  }, [enteringProduct]);
+  return (
+    <>
+      <TextField
+        label={label}
+        error={helperText === NUMBER_INPUT_ERROR_MSG ? true : false}
+        disabled={disabled}
+        autoFocus
+        margin="normal"
+        id="equivalents"
+        fullWidth
+        variant="standard"
+        helperText={helperText}
+        onChange={(event) => {
+          const val = event.target.value;
+          const numVal = Number(val);
+          if (isNaN(numVal)) {
+            setHelperText(NUMBER_INPUT_ERROR_MSG);
+          } else {
+            setHelperText("");
+          }
+
+          handleSetAmt(numVal);
+        }}
+      />
+      <ToggleButtonGroup
+        value={unit}
+        onChange={handleUnit}
+        exclusive
+        aria-label="choose units"
+      >
+        <ToggleButton value="mg" aria-label="milligrams">
+          mg
+        </ToggleButton>
+        <ToggleButton value="g" aria-label="grams">
+          g
+        </ToggleButton>
+        <ToggleButton value="mL" aria-label="milliliters">
+          mL
+        </ToggleButton>
+        <ToggleButton value="L" aria-label="liters">
+          L
+        </ToggleButton>
+      </ToggleButtonGroup>
+    </>
+  );
+};
+
 interface ReactionSchemeLocationFormProps {
   setReactionSchemeLocation: Dispatch<
     SetStateAction<ReactionSchemeLocation | undefined>
@@ -534,6 +617,7 @@ export const AddReagentDialog = ({
   setAddedReagentIds,
 }: AddReagentDialogProps) => {
   const [eq, setEq] = useState<number | null>(null);
+  const [amt, setAmt] = useState<number | null>(null);
   const [reagentName, setReagentName] = useState<string>();
   const [canonicalSMILES, setCanonicalSMILES] = useState<string>();
   // set mw and density as string because populating the value of textfield programatically
@@ -702,6 +786,10 @@ export const AddReagentDialog = ({
               handleSetEq={setEq}
               limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned}
               enteringProduct={enteringProduct}
+            />
+            <AmountInputForm
+              enteringProduct={enteringProduct}
+              handleSetAmt={setAmt}
             />
             <ReactionSchemeLocationForm
               setReactionSchemeLocation={setReactionSchemeLocation}

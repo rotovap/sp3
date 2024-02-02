@@ -33,7 +33,7 @@ export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
 
   const lr = experiment.reagents.find((i) => i.limitingReagent);
 
-  // TODO calculate mmol
+  // TODO: calculate mmol - need first to be able to add the desired amount of limiting reagent
   return (
     <>
       <Stack>
