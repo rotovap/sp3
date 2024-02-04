@@ -477,10 +477,12 @@ const EquivalentsInputForm = ({
 interface AmountInputFormProps {
   handleSetAmt: Dispatch<SetStateAction<number | null>>;
   enteringProduct: boolean;
+  limitingReagentAlreadyAssigned: boolean;
 }
 const AmountInputForm = ({
   handleSetAmt,
   enteringProduct,
+  limitingReagentAlreadyAssigned,
 }: AmountInputFormProps) => {
   const [unit, setUnit] = useState<"g" | "mg" | "mL" | "L">("g");
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -488,7 +490,7 @@ const AmountInputForm = ({
   const [helperText, setHelperText] = useState<string>("");
 
   const handleUnit = (
-    event: React.MouseEvent<HTMLElement>,
+    _: React.MouseEvent<HTMLElement>,
     unit: string | null,
   ) => {
     if (
@@ -502,6 +504,11 @@ const AmountInputForm = ({
   useEffect(() => {
     if (enteringProduct) {
       setLabel("Theoretical yield will be calculated");
+      setDisabled(true);
+    } else if (limitingReagentAlreadyAssigned) {
+      setLabel(
+        "Amount will be calculated based of the amount off the limiting reagent",
+      );
       setDisabled(true);
     } else {
       setLabel("Amount");
@@ -640,7 +647,7 @@ export const AddReagentDialog = ({
   const [successfulAdd, setSuccessfulAdd] = useState<boolean>();
   const [errorMsg, setErrorMsg] = useState<string>();
   const [enteringProduct, setEnteringProduct] = useState<boolean>(false);
-  console.log(experiment);
+
   const limitingReagentAlreadyAssigned = experiment.reagents.find(
     (i) => i.limitingReagent === true,
   )
@@ -790,6 +797,7 @@ export const AddReagentDialog = ({
             <AmountInputForm
               enteringProduct={enteringProduct}
               handleSetAmt={setAmt}
+              limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned}
             />
             <ReactionSchemeLocationForm
               setReactionSchemeLocation={setReactionSchemeLocation}
