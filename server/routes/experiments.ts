@@ -5,9 +5,11 @@ import {
   ExperimentReagent,
   Prisma,
   Reagent,
+  AmtPlannedUnit,
 } from "@prisma/client";
 import { Router } from "express";
 import { TypedRequestBody, TypedResponse } from "../types";
+import { isSomeEnum } from "../utils";
 
 export const experimentRoutes = Router();
 
@@ -47,6 +49,8 @@ export interface AssignReagentToExperimentHandlerRequest {
   reactionSchemeLocation: ReactionSchemeLocation;
   equivalents: number;
   limitingReagent: boolean;
+  amountPlannedInGrams: number;
+  amountPlannedUnit: string;
 }
 
 export interface AssignReagentToExperimentHandlerResponse {
@@ -65,6 +69,8 @@ const _assignExperimentReagent = async ({
   reactionSchemeLocation,
   limitingReagent,
   equivalents,
+  amountPlannedInGrams,
+  amountPlannedUnit,
 }: AssignReagentToExperimentHandlerRequest): Promise<FullExperimentReagent> => {
   const txRes = await prisma.$transaction(async (tx) => {
     // should only be one limiting reagent in the experiment
@@ -84,19 +90,27 @@ const _assignExperimentReagent = async ({
         `Experiment ${experimentId} already has a limiting reagent: ${existingLimitingReagent.reagent.name}`,
       );
     }
+    const unit = amountPlannedUnit.toUpperCase();
+    if (isSomeEnum(AmtPlannedUnit)(unit)) {
+      const result = await tx.experimentReagent.create({
+        data: {
+          reagentId: Number(reagentId),
+          experimentId: Number(experimentId),
+          reactionSchemeLocation: reactionSchemeLocation,
+          equivalents: equivalents,
+          limitingReagent: limitingReagent,
+          amountPlannedInGrams: amountPlannedInGrams,
+          amountPlannedUnit: unit,
+        },
+        include: { experiment: { include: { reagents: true } } },
+      });
 
-    const result = await tx.experimentReagent.create({
-      data: {
-        reagentId: Number(reagentId),
-        experimentId: Number(experimentId),
-        reactionSchemeLocation: reactionSchemeLocation,
-        equivalents: equivalents,
-        limitingReagent: limitingReagent,
-      },
-      include: { experiment: { include: { reagents: true } } },
-    });
-
-    return result;
+      return result;
+    } else {
+      throw new Error(
+        `The amountPlannedUnit ${amountPlannedUnit} is not a part of the allowed units`,
+      );
+    }
   });
   return txRes;
 };
@@ -113,6 +127,8 @@ export const assignReagentToExperiment = async (
     reactionSchemeLocation,
     equivalents,
     limitingReagent,
+    amountPlannedInGrams,
+    amountPlannedUnit,
   } = req.body;
 
   try {
@@ -122,6 +138,8 @@ export const assignReagentToExperiment = async (
       reactionSchemeLocation: reactionSchemeLocation,
       equivalents: equivalents,
       limitingReagent: limitingReagent,
+      amountPlannedInGrams: amountPlannedInGrams,
+      amountPlannedUnit: amountPlannedUnit,
     });
     return res.json({ experiment: txRes.experiment });
   } catch (e) {
@@ -166,6 +184,8 @@ interface RawExperimentQueryResult {
   parentId: number;
   erId: number;
   erExperimentId: number;
+  amountPlannedInGrams: number;
+  amountPlannedUnit: AmtPlannedUnit;
   reactionSchemeLocation: ReactionSchemeLocation;
   erReagentId: number;
   equivalents: number;
@@ -195,6 +215,8 @@ export const getExperimentByIdHandler = async (
             er."reagentId" AS "erReagentId",
             er.equivalents,
             er."limitingReagent",
+            er."amountPlannedInGrams", 
+            er."amountPlannedUnit",
             r.id AS "rId",
             r.name AS "rName",
             r."canonicalSMILES"::text,
@@ -225,6 +247,8 @@ export const getExperimentByIdHandler = async (
                 limitingReagent: i.limitingReagent,
                 reactionSchemeLocation: i.reactionSchemeLocation,
                 reagentId: i.rId,
+                amountPlannedInGrams: i.amountPlannedInGrams,
+                amountPlannedUnit: i.amountPlannedUnit,
                 reagent: {
                   id: i.rId,
                   density: i.density,

@@ -1,5 +1,6 @@
 import { server } from "../index";
 import {
+  AmtPlannedUnit,
   ExperimentReagent,
   PrismaClient,
   ReactionSchemeLocation,
@@ -77,6 +78,8 @@ describe("experiments routes", () => {
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
         limitingReagent: true,
+        amountPlannedInGrams: 10,
+        amountPlannedUnit: "G",
       };
 
       const result = await supertest(server)
@@ -96,6 +99,8 @@ describe("experiments routes", () => {
               experimentId: 1,
               limitingReagent: false,
               equivalents: 1,
+              amountPlannedInGrams: 20,
+              amountPlannedUnit: AmtPlannedUnit.G,
             },
             {
               id: 2,
@@ -104,6 +109,8 @@ describe("experiments routes", () => {
               experimentId: 1,
               limitingReagent: false,
               equivalents: 1,
+              amountPlannedInGrams: 20,
+              amountPlannedUnit: AmtPlannedUnit.ML,
             },
             {
               id: 9,
@@ -112,6 +119,8 @@ describe("experiments routes", () => {
               experimentId: 1,
               equivalents: 1,
               limitingReagent: true,
+              amountPlannedInGrams: 10,
+              amountPlannedUnit: AmtPlannedUnit.G,
             },
           ].sort(compareExptReagent),
         },
@@ -134,6 +143,8 @@ describe("experiments routes", () => {
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 10,
+        amountPlannedUnit: "G",
       };
 
       await supertest(server)
@@ -149,6 +160,8 @@ describe("experiments routes", () => {
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 10,
+        amountPlannedUnit: "G",
       };
 
       await supertest(server)
@@ -164,6 +177,8 @@ describe("experiments routes", () => {
         reactionSchemeLocation: "ABOVE_ARROW",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 10,
+        amountPlannedUnit: "G",
       };
 
       const result = await supertest(server)
@@ -183,6 +198,8 @@ describe("experiments routes", () => {
               limitingReagent: true,
               reactionSchemeLocation: ReactionSchemeLocation.LEFT_SIDE,
               reagentId: 4,
+              amountPlannedInGrams: null,
+              amountPlannedUnit: null,
             },
             {
               equivalents: 1,
@@ -191,6 +208,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: ReactionSchemeLocation.LEFT_SIDE,
               reagentId: 5,
+              amountPlannedInGrams: null,
+              amountPlannedUnit: null,
             },
             {
               equivalents: 1,
@@ -199,6 +218,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: ReactionSchemeLocation.ABOVE_ARROW,
               reagentId: 6,
+              amountPlannedInGrams: null,
+              amountPlannedUnit: null,
             },
             {
               equivalents: 1,
@@ -207,6 +228,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: ReactionSchemeLocation.BELOW_ARROW,
               reagentId: 7,
+              amountPlannedInGrams: null,
+              amountPlannedUnit: null,
             },
             {
               equivalents: 1,
@@ -215,6 +238,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: ReactionSchemeLocation.BELOW_ARROW,
               reagentId: 8,
+              amountPlannedInGrams: null,
+              amountPlannedUnit: null,
             },
             {
               equivalents: 1,
@@ -223,6 +248,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: ReactionSchemeLocation.RIGHT_SIDE,
               reagentId: 9,
+              amountPlannedInGrams: null,
+              amountPlannedUnit: null,
             },
             {
               equivalents: 1,
@@ -231,6 +258,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: ReactionSchemeLocation.ABOVE_ARROW,
               reagentId: 1,
+              amountPlannedInGrams: 10,
+              amountPlannedUnit: AmtPlannedUnit.G,
             },
           ].sort(compareExptReagent),
         },
@@ -253,6 +282,8 @@ describe("experiments routes", () => {
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
         limitingReagent: true,
+        amountPlannedInGrams: 10,
+        amountPlannedUnit: "G",
       };
 
       const res = await supertest(server)
@@ -282,6 +313,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: "ABOVE_ARROW",
               reagentId: 2,
+              amountPlannedInGrams: 20,
+              amountPlannedUnit: "G",
               reagent: {
                 density: 0.6,
                 id: 2,
@@ -297,6 +330,8 @@ describe("experiments routes", () => {
               limitingReagent: false,
               reactionSchemeLocation: "BELOW_ARROW",
               reagentId: 3,
+              amountPlannedInGrams: 20,
+              amountPlannedUnit: "ML",
               reagent: {
                 density: 0.888,
                 id: 3,

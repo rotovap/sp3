@@ -132,12 +132,16 @@ const seedAssignReagentToExperiments = async () => {
         reactionSchemeLocation: "ABOVE_ARROW",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 20,
+        amountPlannedUnit: "G",
       },
       {
         reagentId: 3,
         experimentId: 1,
         reactionSchemeLocation: "BELOW_ARROW",
         equivalents: 1,
+        amountPlannedInGrams: 20,
+        amountPlannedUnit: "ML",
         limitingReagent: false,
       },
       {
