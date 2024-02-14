@@ -150,6 +150,8 @@ const seedAssignReagentToExperiments = async () => {
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
         limitingReagent: true,
+        amountPlannedInGrams: 1,
+        amountPlannedUnit: "G",
       },
       {
         reagentId: 5,
@@ -157,6 +159,8 @@ const seedAssignReagentToExperiments = async () => {
         reactionSchemeLocation: "LEFT_SIDE",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 1,
+        amountPlannedUnit: "G",
       },
       {
         reagentId: 6,
@@ -164,6 +168,8 @@ const seedAssignReagentToExperiments = async () => {
         reactionSchemeLocation: "ABOVE_ARROW",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 0.1,
+        amountPlannedUnit: "G",
       },
       {
         reagentId: 7,
@@ -171,6 +177,8 @@ const seedAssignReagentToExperiments = async () => {
         reactionSchemeLocation: "BELOW_ARROW",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 1.2,
+        amountPlannedUnit: "G",
       },
       {
         reagentId: 8,
@@ -178,6 +186,8 @@ const seedAssignReagentToExperiments = async () => {
         reactionSchemeLocation: "BELOW_ARROW",
         equivalents: 1,
         limitingReagent: false,
+        amountPlannedInGrams: 1,
+        amountPlannedUnit: "G",
       },
       {
         reagentId: 9,
