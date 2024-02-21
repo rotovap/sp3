@@ -91,11 +91,15 @@ const seedProjects = async () => {
 
 const seedExperiments = async () => {
   await prisma.project.findFirst({ where: { name: "step 1 - aryl coupling" } });
-  await prisma.experiment.create({
-    data: {
-      parentId: EGFR2ID,
-      name: "01012024-suzuki coupling",
-    },
+  await prisma.experiment.createMany({
+    data: [
+      {
+        parentId: EGFR2ID,
+        name: "01012024-random reaction",
+      },
+      { parentId: EGFR2ID, name: "01012024-suzuki coupling" },
+      { parentId: EGFR2ID, name: "An experiment with no reagents yet" },
+    ],
   });
 };
 
@@ -105,7 +109,17 @@ const seedReagents = async () => {
         (name, "canonicalSMILES", "molecularWeight", density)
         VALUES
         ('ethanol', 'CCO', 46.07, 0.79),
-        ('butane', 'CCCC', 58.12, 0.6)
+        ('butane', 'CCCC', 58.12, 0.6),
+        ('thf', 'C1CCOC1', 72.11, 0.888),
+        ('diethyl(3-pyridyl)borane', 'CCB(CC)c1cccnc1', 147.03, NULL),
+        ('1-bromo-3-(methylsulfonyl)benzene','CS(=O)(=O)c1cccc(Br)c1', 235.10, NULL),
+        ('Pd(PPh3)4', 
+            '[Pd]([P](c1ccccc1)(c1ccccc1)c1ccccc1)([P](c1ccccc1)(c1ccccc1)c1ccccc1)([P](c1ccccc1)(c1ccccc1)c1ccccc1)[P](c1ccccc1)(c1ccccc1)c1ccccc1',
+            1154.26803,
+            NULL),
+        ('tbab', 'CCCC[N+](CCCC)(CCCC)CCCC.[Br-]', 322.37, NULL),
+        ('K2CO3', 'O=C([O-])[O-].[K+].[K+]', 138.205, NULL),
+        (NULL, 'CS(=O)(=O)c1cccc(-c2cccnc2)c1', 233.05104, NULL)
 `;
 };
 
@@ -117,6 +131,70 @@ const seedAssignReagentToExperiments = async () => {
         experimentId: 1,
         reactionSchemeLocation: "ABOVE_ARROW",
         equivalents: 1,
+        limitingReagent: false,
+        amountPlannedInGrams: 20,
+        amountPlannedUnit: "G",
+      },
+      {
+        reagentId: 3,
+        experimentId: 1,
+        reactionSchemeLocation: "BELOW_ARROW",
+        equivalents: 1,
+        amountPlannedInGrams: 20,
+        amountPlannedUnit: "ML",
+        limitingReagent: false,
+      },
+      {
+        reagentId: 4,
+        experimentId: 2,
+        reactionSchemeLocation: "LEFT_SIDE",
+        equivalents: 1,
+        limitingReagent: true,
+        amountPlannedInGrams: 1,
+        amountPlannedUnit: "G",
+      },
+      {
+        reagentId: 5,
+        experimentId: 2,
+        reactionSchemeLocation: "LEFT_SIDE",
+        equivalents: 1,
+        limitingReagent: false,
+        amountPlannedInGrams: 1,
+        amountPlannedUnit: "G",
+      },
+      {
+        reagentId: 6,
+        experimentId: 2,
+        reactionSchemeLocation: "ABOVE_ARROW",
+        equivalents: 1,
+        limitingReagent: false,
+        amountPlannedInGrams: 0.1,
+        amountPlannedUnit: "G",
+      },
+      {
+        reagentId: 7,
+        experimentId: 2,
+        reactionSchemeLocation: "BELOW_ARROW",
+        equivalents: 1,
+        limitingReagent: false,
+        amountPlannedInGrams: 1.2,
+        amountPlannedUnit: "G",
+      },
+      {
+        reagentId: 8,
+        experimentId: 2,
+        reactionSchemeLocation: "BELOW_ARROW",
+        equivalents: 1,
+        limitingReagent: false,
+        amountPlannedInGrams: 1,
+        amountPlannedUnit: "G",
+      },
+      {
+        reagentId: 9,
+        experimentId: 2,
+        reactionSchemeLocation: "RIGHT_SIDE",
+        equivalents: 1,
+        limitingReagent: false,
       },
     ],
   });

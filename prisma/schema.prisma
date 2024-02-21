@@ -38,8 +38,19 @@ model ExperimentReagent {
   reagentId              Int
   reagent                Reagent                @relation(fields: [reagentId], references: [id])
   equivalents            Float
+  limitingReagent        Boolean
+  // just store in grams and do conversion when needed
+  amountPlannedInGrams   Float?
+  amountPlannedUnit      AmtPlannedUnit?
 
   @@unique([experimentId, reagentId])
+}
+
+enum AmtPlannedUnit {
+  G
+  MG
+  ML
+  L
 }
 
 enum ReactionSchemeLocation {

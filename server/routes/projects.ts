@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, Project } from "@prisma/client";
+import { Experiment, Prisma, PrismaClient, Project } from "@prisma/client";
 import { Router } from "express";
 import { TypedRequestBody, TypedResponse } from "../types";
 import sharp from "sharp";
@@ -34,6 +34,7 @@ const project2ProjectWithDataBuffer = (
 export type ProjectWithDataBuffer = Omit<Project, "image"> & {
   base64image: string | null;
   children?: ProjectWithDataBuffer[];
+  experiments?: Experiment[];
 };
 
 export interface GetTopLevelProjectsHandlerResponse {
@@ -63,7 +64,7 @@ export const getProjectByIdHandler = async (
 ) => {
   const project = await prisma.project.findUnique({
     where: { id: Number(req.params.id) },
-    include: { children: true },
+    include: { children: true, experiments: true },
   });
 
   if (!project) {
