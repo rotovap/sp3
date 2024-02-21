@@ -41,6 +41,9 @@ import {
   AssignReagentToExperimentHandlerResponse,
   ExperimentWithReagents,
 } from "../../../server/routes/experiments";
+import { AmtPlannedUnit } from "@prisma/client";
+import { isSomeEnum } from "../../../server/utils";
+import { calculateAmountInMgOfReagent } from "../utils";
 
 // in the client, @prisma/client is not available because that is in the backend
 // that is not available when the client and server are in different containers
@@ -474,8 +477,64 @@ const EquivalentsInputForm = ({
   );
 };
 
+interface DisplayCalculatedAmountProps {
+  eq: number | null;
+  mmolOfLimitingReagent: number;
+  molecularWeightOfCurrentReagent: number;
+  unit: AmtPlannedUnit;
+  density?: number;
+  handleSetAmt: Dispatch<SetStateAction<number | undefined>>;
+}
+const DisplayCalculatedAmount = ({
+  eq,
+  mmolOfLimitingReagent,
+  molecularWeightOfCurrentReagent,
+  unit,
+  density,
+  handleSetAmt,
+}: DisplayCalculatedAmountProps) => {
+  const [amt, setAmt] = useState<number>();
+
+  useEffect(() => {
+    if (eq) {
+      // recalculate the amount
+      const amountInMg = calculateAmountInMgOfReagent(
+        eq,
+        mmolOfLimitingReagent,
+        molecularWeightOfCurrentReagent,
+      );
+
+      if (unit === "G") {
+        setAmt(amountInMg * 1000);
+      } else if (unit === "ML") {
+        if (density) {
+          setAmt((amountInMg * density) / 1000);
+        }
+        // else throw error?
+      } else if (unit === "L") {
+        if (density) {
+          setAmt((amountInMg * density) / 1000 / 1000);
+        }
+      } else {
+        setAmt(amountInMg);
+      }
+      handleSetAmt(amt);
+    }
+  }, [unit]);
+  return (
+    <>
+      Calculated amount:
+      {amt ? (
+        <Typography>
+          {amt} {unit}
+        </Typography>
+      ) : null}
+    </>
+  );
+};
+
 interface AmountInputFormProps {
-  handleSetAmt: Dispatch<SetStateAction<number | null>>;
+  handleSetAmt: Dispatch<SetStateAction<number | undefined>>;
   enteringProduct: boolean;
   limitingReagentAlreadyAssigned: boolean;
 }
@@ -484,74 +543,86 @@ const AmountInputForm = ({
   enteringProduct,
   limitingReagentAlreadyAssigned,
 }: AmountInputFormProps) => {
-  const [unit, setUnit] = useState<"g" | "mg" | "mL" | "L">("g");
   const [disabled, setDisabled] = useState<boolean>(false);
   const [label, setLabel] = useState<string>("Amount");
   const [helperText, setHelperText] = useState<string>("");
 
-  const handleUnit = (
-    _: React.MouseEvent<HTMLElement>,
-    unit: string | null,
-  ) => {
-    if (
-      unit !== null &&
-      (unit === "g" || unit === "mg" || unit === "mL" || unit === "L")
-    ) {
-      setUnit(unit);
-    }
-  };
-
   useEffect(() => {
     if (enteringProduct) {
       setLabel("Theoretical yield will be calculated");
-      setDisabled(true);
-    } else if (limitingReagentAlreadyAssigned) {
-      setLabel(
-        "Amount will be calculated based of the amount off the limiting reagent",
-      );
       setDisabled(true);
     } else {
       setLabel("Amount");
       setDisabled(false);
     }
   }, [enteringProduct]);
+
+  // show the text field if the user is assigning limiting reagent
+  // otherwise, just show the calculated the amount, but allow the user to change
+  // the units. Perhaps they want to weigh the reagent on a scale, or they
+  // want to measure with volume
   return (
     <>
-      <TextField
-        label={label}
-        error={helperText === NUMBER_INPUT_ERROR_MSG ? true : false}
-        disabled={disabled}
-        autoFocus
-        margin="normal"
-        id="equivalents"
-        fullWidth
-        variant="standard"
-        helperText={helperText}
-        onChange={(event) => {
-          const val = event.target.value;
-          const numVal = Number(val);
-          if (isNaN(numVal)) {
-            setHelperText(NUMBER_INPUT_ERROR_MSG);
-          } else {
-            setHelperText("");
-          }
+      {limitingReagentAlreadyAssigned ? (
+        <Typography>Calculated Amount: {}</Typography>
+      ) : (
+        <TextField
+          label={label}
+          error={helperText === NUMBER_INPUT_ERROR_MSG ? true : false}
+          disabled={disabled}
+          autoFocus
+          margin="normal"
+          id="equivalents"
+          fullWidth
+          variant="standard"
+          helperText={helperText}
+          onChange={(event) => {
+            const val = event.target.value;
+            const numVal = Number(val);
+            if (isNaN(numVal)) {
+              setHelperText(NUMBER_INPUT_ERROR_MSG);
+            } else {
+              setHelperText("");
+            }
 
-          handleSetAmt(numVal);
-        }}
-      />
+            handleSetAmt(numVal);
+          }}
+        />
+      )}
+    </>
+  );
+};
+
+interface UnitToggleProps {
+  unit: AmtPlannedUnit;
+  handleSetUnit: Dispatch<SetStateAction<AmtPlannedUnit>>;
+}
+const UnitToggle = ({ handleSetUnit, unit }: UnitToggleProps) => {
+  const handleUnit = (
+    _: React.MouseEvent<HTMLElement>,
+    unit: string | null,
+  ) => {
+    if (unit !== null && isSomeEnum(AmtPlannedUnit)(unit)) {
+      handleSetUnit(unit);
+    }
+  };
+
+  return (
+    <>
+      {" "}
       <ToggleButtonGroup
         value={unit}
         onChange={handleUnit}
         exclusive
         aria-label="choose units"
       >
-        <ToggleButton value="mg" aria-label="milligrams">
+        <ToggleButton value="MG" aria-label="milligrams">
           mg
         </ToggleButton>
-        <ToggleButton value="g" aria-label="grams">
+        <ToggleButton value="G" aria-label="grams">
           g
         </ToggleButton>
-        <ToggleButton value="mL" aria-label="milliliters">
+        <ToggleButton value="ML" aria-label="milliliters">
           mL
         </ToggleButton>
         <ToggleButton value="L" aria-label="liters">
@@ -624,7 +695,8 @@ export const AddReagentDialog = ({
   setAddedReagentIds,
 }: AddReagentDialogProps) => {
   const [eq, setEq] = useState<number | null>(null);
-  const [amt, setAmt] = useState<number | null>(null);
+  const [amt, setAmt] = useState<number>();
+  const [unit, setUnit] = useState<AmtPlannedUnit>(AmtPlannedUnit.G);
   const [reagentName, setReagentName] = useState<string>();
   const [canonicalSMILES, setCanonicalSMILES] = useState<string>();
   // set mw and density as string because populating the value of textfield programatically
@@ -693,12 +765,15 @@ export const AddReagentDialog = ({
     // the form has been validated by the SAVE button logic,
     // here the check is to typeguard
     if (reactionSchemeLocation && eq) {
+      // TODO: calculate the amount if it is not limiting reagent
       const reagentToAssign: AssignReagentToExperimentHandlerRequest = {
         reagentId: reagentId.toString(),
         experimentId: experiment.id.toString(),
         reactionSchemeLocation: reactionSchemeLocation,
         equivalents: eq,
         limitingReagent: limitingReagentAlreadyAssigned ? false : true,
+        amountPlannedInGrams: amt ?? 0,
+        amountPlannedUnit: unit,
       };
 
       const assignReagentToExptAPIReq = await fetch(
@@ -794,11 +869,23 @@ export const AddReagentDialog = ({
               limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned}
               enteringProduct={enteringProduct}
             />
-            <AmountInputForm
-              enteringProduct={enteringProduct}
-              handleSetAmt={setAmt}
-              limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned}
-            />
+            {limitingReagentAlreadyAssigned ? (
+              <DisplayCalculatedAmount
+                eq={eq}
+                mmolOfLimitingReagent={1}
+                molecularWeightOfCurrentReagent={Number(molecularWeightString)}
+                density={Number(density)}
+                handleSetAmt={setAmt}
+                unit={unit}
+              />
+            ) : (
+              <AmountInputForm
+                enteringProduct={enteringProduct}
+                handleSetAmt={setAmt}
+                limitingReagentAlreadyAssigned={limitingReagentAlreadyAssigned}
+              />
+            )}
+            <UnitToggle handleSetUnit={setUnit} unit={unit} />
             <ReactionSchemeLocationForm
               setReactionSchemeLocation={setReactionSchemeLocation}
             />

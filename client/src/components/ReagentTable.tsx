@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { ExperimentWithReagents } from "../../../server/routes/experiments";
 import SpeedIcon from "@mui/icons-material/Speed";
+import { calculateMmolOfLimitingReagent } from "../utils";
 
 interface Props {
   experiment: ExperimentWithReagents;
@@ -33,6 +34,15 @@ export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
 
   const lr = experiment.reagents.find((i) => i.limitingReagent);
 
+  if (lr?.amountPlannedInGrams) {
+  }
+
+  const lrMmol = lr?.amountPlannedInGrams
+    ? calculateMmolOfLimitingReagent(
+        lr.amountPlannedInGrams,
+        lr?.reagent.molecularWeight,
+      )
+    : null;
   // TODO: calculate mmol - need first to be able to add the desired amount of limiting reagent
   return (
     <>
@@ -67,9 +77,9 @@ export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
                   <TableCell align="right">
                     {lr.reagent.density ?? "--"}
                   </TableCell>
-                  <TableCell align="right">mmol</TableCell>
+                  <TableCell align="right">{lrMmol}</TableCell>
                   <TableCell align="right">{lr.equivalents}</TableCell>
-                  <TableCell align="right">1g</TableCell>
+                  <TableCell align="right">{lr.amountPlannedInGrams}</TableCell>
                 </TableRow>
               ) : null}
               {experiment.reagents.map((i, idx) => {
@@ -80,18 +90,11 @@ export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
                   const { name, molecularWeight, density } = i.reagent;
                   return (
                     <TableRow key={idx}>
-                      <TableCell>
-                        {i.limitingReagent ? (
-                          <Tooltip title="Limiting reagent">
-                            <SpeedIcon fontSize="small" />
-                          </Tooltip>
-                        ) : null}
-                        {i.reagent.id}
-                      </TableCell>
+                      <TableCell>{i.reagent.id}</TableCell>
                       <TableCell align="right">{name}</TableCell>
                       <TableCell align="right">{molecularWeight}</TableCell>
                       <TableCell align="right">{density ?? "--"}</TableCell>
-                      <TableCell align="right">mmol</TableCell>
+                      <TableCell align="right">{}</TableCell>
                       <TableCell align="right">{i.equivalents}</TableCell>
                       <TableCell align="right">1g</TableCell>
                     </TableRow>

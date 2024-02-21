@@ -24,6 +24,7 @@ export const ProjectOverview = () => {
         title={"Projects"}
         projects={projects}
         setProjects={setProjects}
+        setExperiments={() => {}}
       />
     </>
   );
