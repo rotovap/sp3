@@ -65,7 +65,7 @@ export const AddReagentDialog = () => {
           </Typography>
         </DialogContentText>
         <TextField
-          label={"Name or SMILES"}
+          label={"Enter name or SMILES"}
           value={input}
           autoFocus
           margin="normal"
@@ -98,12 +98,12 @@ export const AddReagentDialog = () => {
                 id="structure"
                 structure={smilesQueryResults.reagent?.canonicalSMILES ?? ""}
               />
-              {smilesQueryResults?.reagent?.name}
+              <Typography>{smilesQueryResults?.reagent?.name}</Typography>
             </ListItemButton>
           </List>
         ) : null}
 
-        {!smilesQueryResults && !nameQueryResults ? (
+        {input && !smilesQueryResults && !nameQueryResults ? (
           <Typography>Nothing found in DB for this query</Typography>
         ) : null}
       </DialogContent>
