@@ -114,11 +114,7 @@ export const ReagentTable = ({ experiment, setAddedReagentIds }: Props) => {
         fullWidth={true}
         maxWidth="xl"
       >
-        <AddReagentDialog
-          experiment={experiment}
-          setOpen={setOpen}
-          setAddedReagentIds={setAddedReagentIds}
-        />
+        <AddReagentDialog />
       </Dialog>
     </>
   );
