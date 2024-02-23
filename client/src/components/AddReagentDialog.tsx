@@ -1,4 +1,5 @@
 import {
+  Button,
   DialogContent,
   DialogContentText,
   DialogTitle,
@@ -80,7 +81,7 @@ export const AddReagentDialog = () => {
 
         {nameQueryResults ? (
           <List>
-            <Typography>Reagents found by name: </Typography>
+            <Typography>Reagents found with similar name: </Typography>
             {nameQueryResults.reagents.map((i) => (
               <ListItemButton>
                 <ListItemText>{i.name}</ListItemText>
@@ -106,6 +107,28 @@ export const AddReagentDialog = () => {
         {input && !smilesQueryResults && !nameQueryResults ? (
           <Typography>Nothing found in DB for this query</Typography>
         ) : null}
+
+        <Button
+          variant="contained"
+          onClick={async () => {
+            type PubChemResponse = {
+              PropertyTable: {
+                Properties: {
+                  CID: string;
+                  MolecularWeight: string;
+                  CanonicalSMILES: string;
+                }[];
+              };
+            };
+            const response = await fetch(
+              `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${input}/property/MolecularWeight,CanonicalSMILES/json`,
+            );
+
+            console.log(await response.json());
+          }}
+        >
+          Search name on PubChem
+        </Button>
       </DialogContent>
     </>
   );
