@@ -9,25 +9,47 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { GetSimilarReagentsByNameHandlerResponse } from "../../../server/routes/reagents";
+import {
+  GetReagentHandlerResponse,
+  GetSimilarReagentsByNameHandlerResponse,
+} from "../../../server/routes/reagents";
+import MoleculeStructure from "./MoleculeStructure/MoleculeStructure";
 
 export const AddReagentDialog = () => {
   const [input, setInput] = useState<string>();
-  const [queryResults, setQueryResults] =
+  const [nameQueryResults, setNameQueryResults] =
     useState<GetSimilarReagentsByNameHandlerResponse>();
+  const [smilesQueryResults, setSmilesQueryResults] =
+    useState<GetReagentHandlerResponse>();
 
   const searchReagents = async (query: string) => {
     if (query !== "") {
-      const response = await fetch(
+      const nameResponse = await fetch(
         `http://localhost:3000/reagents/getSimilarReagentsByName?name=${query}`,
       );
-      const result: GetSimilarReagentsByNameHandlerResponse =
-        await response.json();
-      if (result.reagents) {
-        setQueryResults(result);
+
+      if (window.RDKit.get_mol(query)?.is_valid()) {
+        const smilesResponse = await fetch(
+          `http://localhost:3000/reagents?smiles=${query}`,
+        );
+        const smilesResult: GetReagentHandlerResponse =
+          await smilesResponse.json();
+
+        if (smilesResult.reagent) {
+          setSmilesQueryResults(smilesResult);
+        } else {
+          setSmilesQueryResults(undefined);
+        }
+      }
+
+      const nameResult: GetSimilarReagentsByNameHandlerResponse =
+        await nameResponse.json();
+      if (nameResult.reagents.length > 0) {
+        setNameQueryResults(nameResult);
       }
     } else {
-      setQueryResults(undefined);
+      setNameQueryResults(undefined);
+      setSmilesQueryResults(undefined);
     }
   };
 
@@ -56,15 +78,33 @@ export const AddReagentDialog = () => {
           }}
         />
 
-        {queryResults ? (
+        {nameQueryResults ? (
           <List>
             <Typography>Reagents found by name: </Typography>
-            {queryResults.reagents.map((i) => (
+            {nameQueryResults.reagents.map((i) => (
               <ListItemButton>
                 <ListItemText>{i.name}</ListItemText>
               </ListItemButton>
             ))}
           </List>
+        ) : null}
+
+        {smilesQueryResults ? (
+          <List>
+            <Typography>Reagents found by SMILES: </Typography>
+
+            <ListItemButton>
+              <MoleculeStructure
+                id="structure"
+                structure={smilesQueryResults.reagent?.canonicalSMILES ?? ""}
+              />
+              {smilesQueryResults?.reagent?.name}
+            </ListItemButton>
+          </List>
+        ) : null}
+
+        {!smilesQueryResults && !nameQueryResults ? (
+          <Typography>Nothing found in DB for this query</Typography>
         ) : null}
       </DialogContent>
     </>
