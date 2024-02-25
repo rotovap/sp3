@@ -30,8 +30,11 @@ export const AddReagentDialog = () => {
       );
 
       if (window.RDKit.get_mol(query)?.is_valid()) {
+        // salts have "." and "[" and "]" characters in the smiles
+        // needs to be uri encoded
+        const encodedSMILES = encodeURIComponent(query);
         const smilesResponse = await fetch(
-          `http://localhost:3000/reagents?smiles=${query}`,
+          `http://localhost:3000/reagents?smiles=${encodedSMILES}`,
         );
         const smilesResult: GetReagentHandlerResponse =
           await smilesResponse.json();
