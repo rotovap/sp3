@@ -148,6 +148,27 @@ describe("reagents routes", () => {
       expect(result.body).toStrictEqual(expectedResult);
     });
 
+    test("gets a reagent if provided a salt", async () => {
+      const encodedSMILES = encodeURIComponent(
+        "CCCC[N+](CCCC)(CCCC)CCCC.[Br-]",
+      );
+      const result = await supertest(server).get(
+        `/reagents?smiles=${encodedSMILES}`,
+      );
+
+      const expectedResult = {
+        reagent: {
+          id: 7,
+          name: "tbab",
+          canonicalSMILES: "CCCC[N+](CCCC)(CCCC)CCCC.[Br-]",
+          molecularWeight: 322.37,
+          density: null,
+        },
+      };
+
+      expect(result.body).toStrictEqual(expectedResult);
+    });
+
     test("throws error if invalid smiles", async () => {
       const result = await supertest(server).get("/reagents?smiles=ABC");
 
