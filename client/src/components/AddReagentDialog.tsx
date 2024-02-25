@@ -9,12 +9,28 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GetReagentHandlerResponse,
   GetSimilarReagentsByNameHandlerResponse,
 } from "../../../server/routes/reagents";
 import MoleculeStructure from "./MoleculeStructure/MoleculeStructure";
+
+type PubChemResponse = {
+  PropertyTable: {
+    Properties: {
+      CID: string;
+      MolecularWeight: string;
+      CanonicalSMILES: string;
+    }[];
+  };
+};
+
+interface PubChemResponseParsed {
+  molecularWeight: number;
+  smiles: string;
+  cid: string;
+}
 
 export const AddReagentDialog = () => {
   const [input, setInput] = useState<string>();
@@ -22,6 +38,21 @@ export const AddReagentDialog = () => {
     useState<GetSimilarReagentsByNameHandlerResponse>();
   const [smilesQueryResults, setSmilesQueryResults] =
     useState<GetReagentHandlerResponse>();
+
+  const [pubChemQueryResults, setPubChemQueryResults] =
+    useState<PubChemResponseParsed>();
+
+  const [pubChemHelperText, setPubChemHelperText] = useState<string>();
+
+  useEffect(() => {
+    // reset everything if the input is deleted by user
+    if (input === "") {
+      setNameQueryResults(undefined);
+      setSmilesQueryResults(undefined);
+      setPubChemQueryResults(undefined);
+      setPubChemHelperText(undefined);
+    }
+  }, [input]);
 
   const searchReagents = async (query: string) => {
     if (query !== "") {
@@ -114,24 +145,47 @@ export const AddReagentDialog = () => {
         <Button
           variant="contained"
           onClick={async () => {
-            type PubChemResponse = {
-              PropertyTable: {
-                Properties: {
-                  CID: string;
-                  MolecularWeight: string;
-                  CanonicalSMILES: string;
-                }[];
-              };
-            };
             const response = await fetch(
               `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${input}/property/MolecularWeight,CanonicalSMILES/json`,
             );
 
-            console.log(await response.json());
+            if (response.status === 200) {
+              const result: PubChemResponse = await response.json();
+              const pcProperties = result.PropertyTable.Properties[0];
+              const pubchemSMILES = pcProperties.CanonicalSMILES;
+              const cid = pcProperties.CID;
+
+              setPubChemQueryResults({
+                molecularWeight: Number(pcProperties.MolecularWeight),
+                smiles: pubchemSMILES,
+                cid: cid,
+              });
+              console.log(pubchemSMILES);
+              setPubChemHelperText("Found in PubChem");
+            } else {
+              setPubChemQueryResults(undefined);
+              setPubChemHelperText("Not found in PubChem");
+            }
           }}
         >
           Search name on PubChem
         </Button>
+
+        {pubChemHelperText ? (
+          <Typography>{pubChemHelperText}</Typography>
+        ) : null}
+
+        {pubChemQueryResults ? (
+          <List>
+            <ListItemButton>
+              <MoleculeStructure
+                id="structure"
+                structure={pubChemQueryResults.smiles}
+              />
+              <Typography>{input}</Typography>
+            </ListItemButton>
+          </List>
+        ) : null}
       </DialogContent>
     </>
   );
