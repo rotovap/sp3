@@ -84,7 +84,7 @@ export const AddReagentDialog = () => {
 
         {nameQueryResults ? (
           <List>
-            <Typography>Reagents found with similar name: </Typography>
+            <Typography>Reagents found in DB with similar name: </Typography>
             {nameQueryResults.reagents.map((i) => (
               <ListItemButton>
                 <ListItemText>{i.name}</ListItemText>
@@ -95,7 +95,7 @@ export const AddReagentDialog = () => {
 
         {smilesQueryResults ? (
           <List>
-            <Typography>Reagents found by SMILES: </Typography>
+            <Typography>Reagents found in DB by SMILES: </Typography>
 
             <ListItemButton>
               <MoleculeStructure
