@@ -14,13 +14,13 @@ import { SearchResult } from "./SearchReagents";
 
 interface Props {
   setOpenSearchExisting: Dispatch<SetStateAction<boolean>>;
-  setOpenSearchPubChem: Dispatch<SetStateAction<boolean>>;
+  setOpenAddNewReagent: Dispatch<SetStateAction<boolean>>;
   setSearchResults: Dispatch<SetStateAction<SearchResult[]>>;
 }
 
 export const SearchExistingReagents = ({
   setOpenSearchExisting,
-  setOpenSearchPubChem,
+  setOpenAddNewReagent,
   setSearchResults,
 }: Props) => {
   const [nameInput, setNameInput] = useState<string>();
@@ -148,11 +148,11 @@ export const SearchExistingReagents = ({
                    * reset the search results when going to the next screen*/
                 }
                 setOpenSearchExisting(false);
-                setOpenSearchPubChem(true);
+                setOpenAddNewReagent(true);
                 setSearchResults([]);
               }}
             >
-              or search pubchem
+              or create new reagent
             </Button>
           </Stack>
           {smilesHelperText ? (

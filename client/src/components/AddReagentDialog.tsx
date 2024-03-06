@@ -1,25 +1,30 @@
-import {
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Typography,
-} from "@mui/material";
+import { DialogContent, DialogTitle } from "@mui/material";
+import { AddNewReagent } from "./AddNewReagent";
 import { SearchReagents } from "./SearchReagents";
+import { useState } from "react";
 
-// TODO: refactor into individual components search by name, by smiles, and pubchem
-// I think they are still too linked
-
+// starts by searching or adding a new reagent to the DB
 export const AddReagentDialog = () => {
+  const [openSearchExisting, setOpenSearchExisting] = useState<boolean>(true);
+  const [openAddNewReagent, setOpenAddNewReagent] = useState<boolean>(false);
   return (
     <>
       <DialogTitle>Add Reagent</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          <Typography component={"span"} variant="body2">
-            Search your database or PubChem for a reagent.
-          </Typography>
-        </DialogContentText>
-        <SearchReagents />
+        {openSearchExisting ? (
+          <SearchReagents
+            openSearchExisting={openSearchExisting}
+            setOpenSearchExisting={setOpenSearchExisting}
+            setOpenAddNewReagent={setOpenAddNewReagent}
+          />
+        ) : null}
+
+        {openAddNewReagent ? (
+          <AddNewReagent
+            setOpenSearchExisting={setOpenSearchExisting}
+            setOpenAddNewReagent={setOpenAddNewReagent}
+          />
+        ) : null}
       </DialogContent>
     </>
   );

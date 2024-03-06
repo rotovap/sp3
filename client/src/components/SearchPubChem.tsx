@@ -25,16 +25,10 @@ interface PubChemResponseParsed {
 }
 
 interface Props {
-  setOpenSearchExisting: Dispatch<SetStateAction<boolean>>;
-  setOpenSearchPubChem: Dispatch<SetStateAction<boolean>>;
   setSearchResults: Dispatch<SetStateAction<SearchResult[]>>;
 }
 
-export const SearchPubChem = ({
-  setOpenSearchExisting,
-  setOpenSearchPubChem,
-  setSearchResults,
-}: Props) => {
+export const SearchPubChem = ({ setSearchResults }: Props) => {
   const [pubchemInput, setPubchemInput] = useState<string>();
 
   useState<PubChemResponseParsed>();
@@ -87,16 +81,6 @@ export const SearchPubChem = ({
             direction="row"
             spacing={3}
           >
-            <Button
-              variant="contained"
-              onClick={() => {
-                setOpenSearchExisting(true);
-                setOpenSearchPubChem(false);
-                setSearchResults([]);
-              }}
-            >
-              Back
-            </Button>
             <Button variant="contained" onClick={() => searchPubChem()}>
               Search name on PubChem
             </Button>
