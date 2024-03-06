@@ -1,4 +1,5 @@
 import {
+  Button,
   Paper,
   Table,
   TableBody,
@@ -15,6 +16,8 @@ import MoleculeStructure from "./MoleculeStructure/MoleculeStructure";
 export interface SearchResult {
   smiles: string;
   name?: string;
+  molecularWeight: number;
+  density?: number;
 }
 
 export const SearchReagents = () => {
@@ -46,15 +49,12 @@ export const SearchReagents = () => {
             <TableRow>
               <TableCell>Structure</TableCell>
               <TableCell align="right">Name</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {searchResults.map((i) => (
-              <TableRow
-                key={i.name}
-                hover={true}
-                onClick={() => console.log(i.smiles)}
-              >
+              <TableRow key={i.name} hover={true}>
                 <TableCell>
                   <MoleculeStructure
                     id="structure"
@@ -63,6 +63,11 @@ export const SearchReagents = () => {
                   />
                 </TableCell>
                 <TableCell align="right">{i.name}</TableCell>
+                <TableCell align="right">
+                  <Button variant="contained" onClick={() => console.log(i)}>
+                    SELECT
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

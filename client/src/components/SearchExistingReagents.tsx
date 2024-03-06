@@ -42,6 +42,8 @@ export const SearchExistingReagents = ({
             return {
               smiles: i.canonicalSMILES,
               name: i.name ?? undefined,
+              molecularWeight: i.molecularWeight,
+              density: i.density ?? undefined,
             };
           }),
         );
@@ -70,6 +72,8 @@ export const SearchExistingReagents = ({
           {
             name: smilesResult.reagent.name ?? undefined,
             smiles: smilesResult.reagent.canonicalSMILES,
+            molecularWeight: smilesResult.reagent.molecularWeight,
+            density: smilesResult.reagent.density ?? undefined,
           },
         ]);
         setSmilesHelperText("Reagents found in DB by SMILES:");

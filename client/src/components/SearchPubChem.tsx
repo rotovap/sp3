@@ -55,6 +55,7 @@ export const SearchPubChem = ({
         {
           smiles: pubchemSMILES,
           name: pubchemInput,
+          molecularWeight: Number(pcProperties.MolecularWeight),
         },
       ]);
       setPubChemHelperText("Reagent found in PubChem");
