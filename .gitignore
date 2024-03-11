@@ -6,3 +6,5 @@ node_modules
 coverage
 uploads
 your-postgresql-db
+# ignore the binary
+sp3

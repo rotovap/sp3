@@ -1,0 +1,7 @@
+package main
+
+import "strconv"
+
+templ ExperimentPage(id int, name string) {
+	<div>Experiment { strconv.Itoa(id) } name: { name }</div>
+}
