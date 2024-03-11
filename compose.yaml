@@ -1,32 +1,32 @@
 version: "3.8"
 services:
-  server:
-    image: node:20
-    restart: always
-    command: sh -c "npm install && npx prisma migrate deploy && npm run start-server"
-    ports:
-      - 127.0.0.1:3000:3000
-    working_dir: /sp3
-    volumes:
-      - ./:/sp3
-    environment:
-      DATABASE_URL: "postgresql://postgres:spthree@db:5432/postgres?schema=public"
-    depends_on:
-      db:
-        condition: service_healthy
-
-  client:
-    image: node:20
-    restart: always
-    command: sh -c "npm install && npm run start"
-    ports:
-      - 127.0.0.1:5173:5173
-    working_dir: /client
-    volumes:
-      - ./client:/client
-    depends_on:
-      db:
-        condition: service_healthy
+  # server:
+  #   image: node:20
+  #   restart: always
+  #   command: sh -c "npm install && npx prisma migrate deploy && npm run start-server"
+  #   ports:
+  #     - 127.0.0.1:3000:3000
+  #   working_dir: /sp3
+  #   volumes:
+  #     - ./:/sp3
+  #   environment:
+  #     DATABASE_URL: "postgresql://postgres:spthree@db:5432/postgres?schema=public"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #
+  # client:
+  #   image: node:20
+  #   restart: always
+  #   command: sh -c "npm install && npm run start"
+  #   ports:
+  #     - 127.0.0.1:5173:5173
+  #   working_dir: /client
+  #   volumes:
+  #     - ./client:/client
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
   db:
     image: mcs07/postgres-rdkit
