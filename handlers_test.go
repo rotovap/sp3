@@ -12,8 +12,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func setupSuite() (*migrate.Migrate, *SqlDb) {
-	fmt.Println("Running setup...")
+func setupSuite() *SqlDb {
 	sqlDb := NewSqlDbConn()
 	driver, err := postgres.WithInstance(sqlDb.db, &postgres.Config{})
 	if err != nil {
@@ -23,17 +22,17 @@ func setupSuite() (*migrate.Migrate, *SqlDb) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	// migrate down to remove anything in DB
+	fmt.Println("Migrating down...")
+	m.Down()
+
+	fmt.Println("Migrating up...")
 	m.Up()
 
 	fmt.Println("seeding database...")
 	seedDb(sqlDb)
 
-	return m, sqlDb
-}
-
-func teardownSuite(m *migrate.Migrate) {
-	fmt.Println("Tearning down...")
-	m.Down()
+	return sqlDb
 }
 
 // func TestGetExperimentHandler(t *testing.T) {
@@ -50,8 +49,7 @@ func teardownSuite(m *migrate.Migrate) {
 // }
 
 func TestGetExperimentById(t *testing.T) {
-	m, sqlDb := setupSuite()
-	defer teardownSuite(m)
+	sqlDb := setupSuite()
 	t.Run("finds an experiment by id", func(t *testing.T) {
 		name, _ := sqlDb.getExperimentById(1)
 		if name != "suzuki coupling" {
@@ -59,7 +57,7 @@ func TestGetExperimentById(t *testing.T) {
 		}
 	})
 
-	t.Run("returns nothin if experiment not found", func(t *testing.T) {
+	t.Run("returns nothing if experiment not found", func(t *testing.T) {
 		_, err := sqlDb.getExperimentById(100)
 		if err != sql.ErrNoRows {
 			t.Errorf("expected %s, got %s", sql.ErrNoRows, err)
