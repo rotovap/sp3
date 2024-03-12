@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/golang-migrate/migrate"
@@ -12,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func setupSuite() *SqlDb {
+func setupSuite() (*migrate.Migrate, *SqlDb) {
 	sqlDb := NewSqlDbConn()
 	driver, err := postgres.WithInstance(sqlDb.db, &postgres.Config{})
 	if err != nil {
@@ -22,23 +23,27 @@ func setupSuite() *SqlDb {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	return m, sqlDb
+}
+
+func migrateDownUp(m *migrate.Migrate, sqlDb *SqlDb) {
 	// migrate down to remove anything in DB
 	fmt.Println("Migrating down...")
-	err = m.Down()
+	err := m.Down()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	fmt.Println("Migrating up...")
 	err = m.Up()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	fmt.Println("seeding database...")
 	seedDb(sqlDb)
 
-	return sqlDb
 }
 
 // func TestGetExperimentHandler(t *testing.T) {
@@ -55,8 +60,9 @@ func setupSuite() *SqlDb {
 // }
 
 func TestGetExperimentById(t *testing.T) {
-	sqlDb := setupSuite()
+	m, sqlDb := setupSuite()
 	t.Run("finds an experiment by id", func(t *testing.T) {
+		migrateDownUp(m, sqlDb)
 		name, _ := sqlDb.getExperimentById(1)
 		if name != "suzuki coupling" {
 			t.Errorf("expected %s, got %s", "suzuki coupling", name)
@@ -64,6 +70,7 @@ func TestGetExperimentById(t *testing.T) {
 	})
 
 	t.Run("returns nothing if experiment not found", func(t *testing.T) {
+		migrateDownUp(m, sqlDb)
 		_, err := sqlDb.getExperimentById(100)
 		if err != sql.ErrNoRows {
 			t.Errorf("expected %s, got %s", sql.ErrNoRows, err)
