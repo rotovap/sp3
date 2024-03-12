@@ -24,10 +24,16 @@ func setupSuite() *SqlDb {
 	}
 	// migrate down to remove anything in DB
 	fmt.Println("Migrating down...")
-	m.Down()
+	err = m.Down()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	fmt.Println("Migrating up...")
-	m.Up()
+	err = m.Up()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	fmt.Println("seeding database...")
 	seedDb(sqlDb)
