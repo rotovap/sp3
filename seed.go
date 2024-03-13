@@ -6,7 +6,7 @@ import (
 )
 
 func seedExperiments(sqlDb *SqlDb) {
-	_, err := sqlDb.db.Exec("INSERT INTO experiments (name) VALUES ($1), ($2)",
+	_, err := sqlDb.db.Exec("INSERT INTO experiment (name) VALUES ($1), ($2)",
 		"suzuki coupling", "amide coupling")
 
 	if err != nil {
@@ -29,7 +29,7 @@ func seedReagents(sqlDb *SqlDb) {
         ('K2CO3', 'O=C([O-])[O-].[K+].[K+]', 138.205, NULL),
         (NULL, 'CS(=O)(=O)c1cccc(-c2cccnc2)c1', 233.05104, NULL)`
 
-	stmt := fmt.Sprintf(`INSERT INTO reagents (name, mol, molecular_weight, density) VALUES %s`, reagents)
+	stmt := fmt.Sprintf(`INSERT INTO reagent (name, mol, molecular_weight, density) VALUES %s`, reagents)
 	_, err := sqlDb.db.Exec(stmt)
 
 	if err != nil {
