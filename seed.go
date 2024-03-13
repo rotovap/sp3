@@ -6,8 +6,14 @@ import (
 )
 
 func seedExperiments(sqlDb *SqlDb) {
-	_, err := sqlDb.db.Exec("INSERT INTO experiment (name) VALUES ($1), ($2)",
-		"suzuki coupling", "amide coupling")
+	experiments := `
+    ('01012024-random reaction'),
+    ('01012024-suzuki coupling'),
+    ('An experiment with no reagents yet')
+    `
+
+	stmt := fmt.Sprintf("INSERT INTO experiment (name) VALUES %s", experiments)
+	_, err := sqlDb.db.Exec(stmt)
 
 	if err != nil {
 		log.Println(err)

@@ -69,8 +69,8 @@ func TestGetExperimentById(t *testing.T) {
 	t.Run("finds an experiment by id", func(t *testing.T) {
 		migrateDownUp(m, sqlDb)
 		name, _ := sqlDb.getExperimentById(1)
-		if name != "suzuki coupling" {
-			t.Errorf("expected %s, got %s", "suzuki coupling", name)
+		if name != "01012024-random reaction" {
+			t.Errorf("expected %s, got %s", "01012024-random reaction", name)
 		}
 	})
 
