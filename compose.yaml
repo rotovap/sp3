@@ -29,7 +29,8 @@ services:
   #       condition: service_healthy
 
   db:
-    image: mcs07/postgres-rdkit
+    # image: mcs07/postgres-rdkit
+    build: .
     restart: always
     ports:
       - 5431:5432
