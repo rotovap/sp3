@@ -10,7 +10,7 @@ import (
 func (SqlDb *SqlDb) getExperimentById(id int) (string, error) {
 	// following example from:
 	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
-	row := SqlDb.db.QueryRow("SELECT name FROM experiments WHERE id=$1",
+	row := SqlDb.db.QueryRow("SELECT name FROM experiment WHERE id=$1",
 		id)
 
 	var name sql.NullString

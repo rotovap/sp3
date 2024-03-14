@@ -23,7 +23,12 @@ func setupSuite() (*migrate.Migrate, *SqlDb) {
 	if err != nil {
 		fmt.Println(err)
 	}
-
+	// if the db hasn't been migrated at all yet, migrate up
+	_, _, err = m.Version()
+	if err == migrate.ErrNilVersion {
+		fmt.Println("no migrations applied yet, migrating up...")
+		m.Up()
+	}
 	return m, sqlDb
 }
 
@@ -64,8 +69,8 @@ func TestGetExperimentById(t *testing.T) {
 	t.Run("finds an experiment by id", func(t *testing.T) {
 		migrateDownUp(m, sqlDb)
 		name, _ := sqlDb.getExperimentById(1)
-		if name != "suzuki coupling" {
-			t.Errorf("expected %s, got %s", "suzuki coupling", name)
+		if name != "01012024-random reaction" {
+			t.Errorf("expected %s, got %s", "01012024-random reaction", name)
 		}
 	})
 
