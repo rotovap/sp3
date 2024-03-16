@@ -1,13 +1,36 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+)
+
+templ ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents []ExperimentAndReagents) {
+	<div class="grid">
+		<div></div>
+		<div>
+			for i := 0; i < len(leftSideReagents); i++ {
+				@templ.Raw(leftSideReagents[i].molSvg)
+				if i != len(leftSideReagents)-1 {
+					{ "+" }
+				}
+			}
+			<img alt="File:Biochem reaction arrow forward NNNN horiz med.svg" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Biochem_reaction_arrow_forward_NNNN_horiz_med.svg/75px-Biochem_reaction_arrow_forward_NNNN_horiz_med.svg.png?20170613181819" decoding="async" width="75" height="75" srcset="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Biochem_reaction_arrow_forward_NNNN_horiz_med.svg/113px-Biochem_reaction_arrow_forward_NNNN_horiz_med.svg.png?20170613181819 1.5x, https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Biochem_reaction_arrow_forward_NNNN_horiz_med.svg/150px-Biochem_reaction_arrow_forward_NNNN_horiz_med.svg.png?20170613181819 2x" data-file-width="75" data-file-height="75"/>
+			for i := 0; i < len(rightSideReagents); i++ {
+				@templ.Raw(rightSideReagents[i].molSvg)
+				if i != len(rightSideReagents)-1 {
+					{ "+" }
+				}
+			}
+		</div>
+		<div></div>
+	</div>
+}
 
 templ ReagentTable(rows []ExperimentAndReagents) {
 	<table>
 		<thead>
 			<tr>
 				<th scope="col">Name</th>
-				<th scope="col">Structure</th>
 				<th scope="col">Mol. Weight (g/mol)</th>
 				<th scope="col">Density (g/mL)</th>
 				<th scope="col">Amount (g)</th>
@@ -16,8 +39,7 @@ templ ReagentTable(rows []ExperimentAndReagents) {
 		<tbody>
 			for _, r := range rows {
 				<tr>
-					<th scope="row">{ r.reagentName.String }</th>
-					<td>{ r.mol.String }</td>
+					<td scope="row">{ r.reagentName.String }</td>
 					<td>{ strconv.FormatFloat(float64(r.molecularWeight.Float64), 'f', -1, 32) }</td>
 					<td>{ strconv.FormatFloat(float64(r.density.Float64), 'f', -1, 32) }</td>
 					<td>{ strconv.FormatFloat(float64(r.amountPlannedInGrams.Float64), 'f', -1, 32) }</td>
@@ -27,14 +49,15 @@ templ ReagentTable(rows []ExperimentAndReagents) {
 	</table>
 }
 
-templ ExperimentPage(id int, e []ExperimentAndReagents) {
+templ ExperimentPage(id int, e []ExperimentAndReagents, leftSideReagents []ExperimentAndReagents, rightSideReagents []ExperimentAndReagents) {
 	@Base() {
-		<main class="container-fluid">
+		<main class="container">
 			<div class="grid">
 				<h1>
 					Experiment { strconv.Itoa(id) }: { e[0].name.String }
 				</h1>
 			</div>
+			@ReactionScheme(leftSideReagents, rightSideReagents)
 			@ReagentTable(e)
 		</main>
 	}

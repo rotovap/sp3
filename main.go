@@ -8,10 +8,11 @@ import (
 )
 
 type ExperimentAndReagents struct {
-	name, reactionSchemeLocation, amountPlannedUnit, reagentName, mol sql.NullString
-	reagentId                                                         sql.NullInt16
-	equivalents, amountPlannedInGrams, molecularWeight, density       sql.NullFloat64
-	limitingReagent                                                   sql.NullBool
+	name, reactionSchemeLocation, amountPlannedUnit, reagentName sql.NullString
+	reagentId                                                    sql.NullInt16
+	equivalents, amountPlannedInGrams, molecularWeight, density  sql.NullFloat64
+	limitingReagent                                              sql.NullBool
+	molSvg                                                       string
 }
 
 func (SqlDb *SqlDb) getReagentsInExperiment(experimentId int) ([]ExperimentAndReagents, error) {
@@ -28,7 +29,8 @@ func (SqlDb *SqlDb) getReagentsInExperiment(experimentId int) ([]ExperimentAndRe
                 r.name AS reagent_name,
                 r.molecular_weight,
                 r.density,
-                r.mol
+                -- clearBackground: 0 will make a transparent background, but the bonds are black so on black background, you can't see the molecule
+                mol_to_svg(r.mol,'', 100, 100, '{"clearBackground": 0}')
           FROM experiment e
           INNER JOIN experiment_reagent_association era
           ON era.exp_id=e.id
@@ -41,6 +43,7 @@ func (SqlDb *SqlDb) getReagentsInExperiment(experimentId int) ([]ExperimentAndRe
 	// var reagent_id sql.NullInt16
 	// var amount_planned_in_grams sql.NullFloat64
 	var r []ExperimentAndReagents
+	var mol sql.NullString
 	for rows.Next() {
 		e := &ExperimentAndReagents{}
 		err = rows.Scan(&e.name,
@@ -53,10 +56,12 @@ func (SqlDb *SqlDb) getReagentsInExperiment(experimentId int) ([]ExperimentAndRe
 			&e.reagentName,
 			&e.molecularWeight,
 			&e.density,
-			&e.mol)
+			&mol)
 		if err != nil {
 			panic(err)
 		}
+		headerLen := len("<?xml version='1.0' encoding='iso-8859-1'?>")
+		e.molSvg = mol.String[headerLen:]
 		r = append(r, *e)
 	}
 	err = rows.Err()
@@ -76,7 +81,17 @@ func (SqlDb *SqlDb) getExperimentHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	result, err := SqlDb.getReagentsInExperiment(id)
-	ExperimentPage(id, result).Render(r.Context(), w)
+	var leftSideReagents []ExperimentAndReagents
+	var rightSideReagents []ExperimentAndReagents
+	for _, r := range result {
+		if r.reactionSchemeLocation.String == "LEFT_SIDE" {
+			leftSideReagents = append(leftSideReagents, r)
+		} else if r.reactionSchemeLocation.String == "RIGHT_SIDE" {
+			rightSideReagents = append(rightSideReagents, r)
+		}
+	}
+
+	ExperimentPage(id, result, leftSideReagents, rightSideReagents).Render(r.Context(), w)
 
 }
 

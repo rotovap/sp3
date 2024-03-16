@@ -67,7 +67,7 @@ func TestGetExperimentById(t *testing.T) {
 	m, sqlDb := setupSuite()
 	t.Run("finds an experiment by id", func(t *testing.T) {
 		migrateDownUp(m, sqlDb)
-		result, _ := sqlDb.getExperimentAndReagentsById(1)
+		result, _ := sqlDb.getReagentsInExperiment(1)
 		fmt.Println(result)
 		if result[0].name.String != "01012024-random reaction" {
 			t.Errorf("expected %s, got %s", "01012024-random reaction", result[0].name.String)
@@ -76,7 +76,7 @@ func TestGetExperimentById(t *testing.T) {
 
 	t.Run("returns nothing if experiment not found", func(t *testing.T) {
 		migrateDownUp(m, sqlDb)
-		result, _ := sqlDb.getExperimentAndReagentsById(100)
+		result, _ := sqlDb.getReagentsInExperiment(100)
 		if len(result) != 0 {
 			t.Errorf("expected empty slice, got %v", result)
 		}
