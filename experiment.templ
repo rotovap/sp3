@@ -6,8 +6,7 @@ import (
 
 templ ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents []ExperimentAndReagents) {
 	<div class="grid">
-		<div></div>
-		<div>
+		<div style="text-align: center">
 			for i := 0; i < len(leftSideReagents); i++ {
 				@templ.Raw(leftSideReagents[i].molSvg)
 				if i != len(leftSideReagents)-1 {
@@ -22,7 +21,6 @@ templ ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents
 				}
 			}
 		</div>
-		<div></div>
 	</div>
 }
 
