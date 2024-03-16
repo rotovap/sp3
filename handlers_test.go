@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"testing"
@@ -68,17 +67,18 @@ func TestGetExperimentById(t *testing.T) {
 	m, sqlDb := setupSuite()
 	t.Run("finds an experiment by id", func(t *testing.T) {
 		migrateDownUp(m, sqlDb)
-		name, _ := sqlDb.getExperimentById(1)
-		if name != "01012024-random reaction" {
-			t.Errorf("expected %s, got %s", "01012024-random reaction", name)
+		result, _ := sqlDb.getExperimentAndReagentsById(1)
+		fmt.Println(result)
+		if result[0].name.String != "01012024-random reaction" {
+			t.Errorf("expected %s, got %s", "01012024-random reaction", result[0].name.String)
 		}
 	})
 
 	t.Run("returns nothing if experiment not found", func(t *testing.T) {
 		migrateDownUp(m, sqlDb)
-		_, err := sqlDb.getExperimentById(100)
-		if err != sql.ErrNoRows {
-			t.Errorf("expected %s, got %s", sql.ErrNoRows, err)
+		result, _ := sqlDb.getExperimentAndReagentsById(100)
+		if len(result) != 0 {
+			t.Errorf("expected empty slice, got %v", result)
 		}
 	})
 

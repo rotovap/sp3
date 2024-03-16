@@ -2,6 +2,40 @@ package main
 
 import "strconv"
 
-templ ExperimentPage(id int, name string) {
-	<div>Experiment { strconv.Itoa(id) } name: { name }</div>
+templ ReagentTable(rows []ExperimentAndReagents) {
+	<table>
+		<thead>
+			<tr>
+				<th scope="col">Name</th>
+				<th scope="col">Structure</th>
+				<th scope="col">Mol. Weight (g/mol)</th>
+				<th scope="col">Density (g/mL)</th>
+				<th scope="col">Amount (g)</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, r := range rows {
+				<tr>
+					<th scope="row">{ r.reagentName.String }</th>
+					<td>{ r.mol.String }</td>
+					<td>{ strconv.FormatFloat(float64(r.molecularWeight.Float64), 'f', -1, 32) }</td>
+					<td>{ strconv.FormatFloat(float64(r.density.Float64), 'f', -1, 32) }</td>
+					<td>{ strconv.FormatFloat(float64(r.amountPlannedInGrams.Float64), 'f', -1, 32) }</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+templ ExperimentPage(id int, e []ExperimentAndReagents) {
+	@Base() {
+		<main class="container-fluid">
+			<div class="grid">
+				<h1>
+					Experiment { strconv.Itoa(id) }: { e[0].name.String }
+				</h1>
+			</div>
+			@ReagentTable(e)
+		</main>
+	}
 }
