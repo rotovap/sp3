@@ -140,7 +140,7 @@ func seedAssignReagentsToExperiments(db *sql.DB) {
 
 }
 
-func seedDb(db *sql.DB) {
+func SeedDb(db *sql.DB) {
 	seedExperiments(db)
 	seedReagents(db)
 	seedAssignReagentsToExperiments(db)
