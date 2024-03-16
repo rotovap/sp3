@@ -2,20 +2,27 @@ package main
 
 import (
 	"strconv"
+	"github.com/rotovap/sp3/models"
 )
 
-templ ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents []ExperimentAndReagents) {
+// cannot seem to store a variable inside the template and the reference it again
+// in another for loop, for example
+// so here, the leftSideReagents and rightSideReagents are first gathered
+// in the Controller and then passed into the View
+// this way the len can be taken and the len used to decide if a "+" should
+// be rendered
+templ ReactionScheme(leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) {
 	<div class="grid">
 		<div style="text-align: center">
 			for i := 0; i < len(leftSideReagents); i++ {
-				@templ.Raw(leftSideReagents[i].molSvg)
+				@templ.Raw(leftSideReagents[i].MolSvg)
 				if i != len(leftSideReagents)-1 {
 					{ "+" }
 				}
 			}
 			<img alt="File:Biochem reaction arrow forward NNNN horiz med.svg" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Biochem_reaction_arrow_forward_NNNN_horiz_med.svg/75px-Biochem_reaction_arrow_forward_NNNN_horiz_med.svg.png?20170613181819" decoding="async" width="75" height="75" srcset="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Biochem_reaction_arrow_forward_NNNN_horiz_med.svg/113px-Biochem_reaction_arrow_forward_NNNN_horiz_med.svg.png?20170613181819 1.5x, https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Biochem_reaction_arrow_forward_NNNN_horiz_med.svg/150px-Biochem_reaction_arrow_forward_NNNN_horiz_med.svg.png?20170613181819 2x" data-file-width="75" data-file-height="75"/>
 			for i := 0; i < len(rightSideReagents); i++ {
-				@templ.Raw(rightSideReagents[i].molSvg)
+				@templ.Raw(rightSideReagents[i].MolSvg)
 				if i != len(rightSideReagents)-1 {
 					{ "+" }
 				}
@@ -24,7 +31,7 @@ templ ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents
 	</div>
 }
 
-templ ReagentTable(rows []ExperimentAndReagents) {
+templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 	<table>
 		<thead>
 			<tr>
@@ -37,22 +44,22 @@ templ ReagentTable(rows []ExperimentAndReagents) {
 		<tbody>
 			for _, r := range rows {
 				<tr>
-					<td scope="row">{ r.reagentName.String }</td>
-					<td>{ strconv.FormatFloat(float64(r.molecularWeight.Float64), 'f', -1, 32) }</td>
-					<td>{ strconv.FormatFloat(float64(r.density.Float64), 'f', -1, 32) }</td>
-					<td>{ strconv.FormatFloat(float64(r.amountPlannedInGrams.Float64), 'f', -1, 32) }</td>
+					<td scope="row">{ r.Reagent.Name.String }</td>
+					<td>{ strconv.FormatFloat(float64(r.Reagent.MolecularWeight), 'f', -1, 32) }</td>
+					<td>{ strconv.FormatFloat(float64(r.Reagent.Density.Float64), 'f', -1, 32) }</td>
+					<td>{ strconv.FormatFloat(float64(r.Association.AmountPlannedInGrams.Float64), 'f', -1, 32) }</td>
 				</tr>
 			}
 		</tbody>
 	</table>
 }
 
-templ ExperimentPage(id int, e []ExperimentAndReagents, leftSideReagents []ExperimentAndReagents, rightSideReagents []ExperimentAndReagents) {
+templ ExperimentPage(id int, e []models.GetReagentsInExperimentResult, leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) {
 	@Base() {
 		<main class="container">
 			<div class="grid">
 				<h1>
-					Experiment { strconv.Itoa(id) }: { e[0].name.String }
+					Experiment { strconv.Itoa(id) }: { e[0].Experiment.Name }
 				</h1>
 			</div>
 			@ReactionScheme(leftSideReagents, rightSideReagents)

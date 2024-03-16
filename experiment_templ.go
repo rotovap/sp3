@@ -11,10 +11,17 @@ import "io"
 import "bytes"
 
 import (
+	"github.com/rotovap/sp3/models"
 	"strconv"
 )
 
-func ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents []ExperimentAndReagents) templ.Component {
+// cannot seem to store a variable inside the template and the reference it again
+// in another for loop, for example
+// so here, the leftSideReagents and rightSideReagents are first gathered
+// in the Controller and then passed into the View
+// this way the len can be taken and the len used to decide if a "+" should
+// be rendered
+func ReactionScheme(leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -32,7 +39,7 @@ func ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents 
 			return templ_7745c5c3_Err
 		}
 		for i := 0; i < len(leftSideReagents); i++ {
-			templ_7745c5c3_Err = templ.Raw(leftSideReagents[i].molSvg).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templ.Raw(leftSideReagents[i].MolSvg).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -44,7 +51,7 @@ func ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents 
 				var templ_7745c5c3_Var2 string
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("+")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 12, Col: 10}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 19, Col: 10}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -61,7 +68,7 @@ func ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents 
 			return templ_7745c5c3_Err
 		}
 		for i := 0; i < len(rightSideReagents); i++ {
-			templ_7745c5c3_Err = templ.Raw(rightSideReagents[i].molSvg).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templ.Raw(rightSideReagents[i].MolSvg).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -73,7 +80,7 @@ func ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents 
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("+")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 19, Col: 10}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 26, Col: 10}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -92,7 +99,7 @@ func ReactionScheme(leftSideReagents []ExperimentAndReagents, rightSideReagents 
 	})
 }
 
-func ReagentTable(rows []ExperimentAndReagents) templ.Component {
+func ReagentTable(rows []models.GetReagentsInExperimentResult) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -115,9 +122,9 @@ func ReagentTable(rows []ExperimentAndReagents) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(r.reagentName.String)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(r.Reagent.Name.String)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 39, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 46, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -128,9 +135,9 @@ func ReagentTable(rows []ExperimentAndReagents) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(r.molecularWeight.Float64), 'f', -1, 32))
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(r.Reagent.MolecularWeight), 'f', -1, 32))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 40, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 47, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -141,9 +148,9 @@ func ReagentTable(rows []ExperimentAndReagents) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(r.density.Float64), 'f', -1, 32))
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(r.Reagent.Density.Float64), 'f', -1, 32))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 41, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 48, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -154,9 +161,9 @@ func ReagentTable(rows []ExperimentAndReagents) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(r.amountPlannedInGrams.Float64), 'f', -1, 32))
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(r.Association.AmountPlannedInGrams.Float64), 'f', -1, 32))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 42, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 49, Col: 96}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -178,7 +185,7 @@ func ReagentTable(rows []ExperimentAndReagents) templ.Component {
 	})
 }
 
-func ExperimentPage(id int, e []ExperimentAndReagents, leftSideReagents []ExperimentAndReagents, rightSideReagents []ExperimentAndReagents) templ.Component {
+func ExperimentPage(id int, e []models.GetReagentsInExperimentResult, leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -204,7 +211,7 @@ func ExperimentPage(id int, e []ExperimentAndReagents, leftSideReagents []Experi
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(id))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 54, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 61, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -215,9 +222,9 @@ func ExperimentPage(id int, e []ExperimentAndReagents, leftSideReagents []Experi
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(e[0].name.String)
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(e[0].Experiment.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 54, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `experiment.templ`, Line: 61, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {

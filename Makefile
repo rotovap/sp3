@@ -1,8 +1,8 @@
 migrate_up:  
-	migrate -database ${POSTGRESQL_URL} -path db/migrations up
+	migrate -database ${POSTGRESQL_URL} -path database/migrations up
 
 migrate_down: 
-	migrate -database ${POSTGRESQL_URL} -path db/migrations down
+	migrate -database ${POSTGRESQL_URL} -path database/migrations down
 
 test:
 	go test

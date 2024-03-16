@@ -1,12 +1,13 @@
-package main
+package database
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"strings"
 )
 
-func seedExperiments(sqlDb *SqlDb) {
+func seedExperiments(db *sql.DB) {
 	experiments := `
     ('01012024-random reaction'),
     ('01012024-suzuki coupling'),
@@ -14,7 +15,7 @@ func seedExperiments(sqlDb *SqlDb) {
     `
 
 	stmt := fmt.Sprintf("INSERT INTO experiment (name) VALUES %s", experiments)
-	_, err := sqlDb.db.Exec(stmt)
+	_, err := db.Exec(stmt)
 
 	if err != nil {
 		log.Println(err)
@@ -22,7 +23,7 @@ func seedExperiments(sqlDb *SqlDb) {
 	}
 }
 
-func seedReagents(sqlDb *SqlDb) {
+func seedReagents(db *sql.DB) {
 	reagents := `('ethanol', 'CCO', 46.07, 0.79),
         ('butane', 'CCCC', 58.12, 0.6),
         ('thf', 'C1CCOC1', 72.11, 0.888),
@@ -37,7 +38,7 @@ func seedReagents(sqlDb *SqlDb) {
         (NULL, 'CS(=O)(=O)c1cccc(-c2cccnc2)c1', 233.05104, NULL)`
 
 	stmt := fmt.Sprintf(`INSERT INTO reagent (name, mol, molecular_weight, density) VALUES %s`, reagents)
-	_, err := sqlDb.db.Exec(stmt)
+	_, err := db.Exec(stmt)
 
 	if err != nil {
 		log.Println(err)
@@ -55,7 +56,7 @@ type ExperimentReagentAssociation struct {
 	amountPlannedUnit      string
 }
 
-func seedAssignReagentsToExperiments(sqlDb *SqlDb) {
+func seedAssignReagentsToExperiments(db *sql.DB) {
 	assignments := []ExperimentReagentAssociation{
 		{
 			reagentId:              2,
@@ -132,15 +133,15 @@ func seedAssignReagentsToExperiments(sqlDb *SqlDb) {
     INSERT INTO experiment_reagent_association 
     (reagent_id, exp_id, reaction_scheme_location, equivalents, limiting_reagent )
     VALUES %s`, values)
-	_, err := sqlDb.db.Exec(stmt)
+	_, err := db.Exec(stmt)
 	if err != nil {
 		log.Fatalf("Error inserting experiment_reagent_association: %s", err)
 	}
 
 }
 
-func seedDb(sqlDb *SqlDb) {
-	seedExperiments(sqlDb)
-	seedReagents(sqlDb)
-	seedAssignReagentsToExperiments(sqlDb)
+func seedDb(db *sql.DB) {
+	seedExperiments(db)
+	seedReagents(db)
+	seedAssignReagentsToExperiments(db)
 }
