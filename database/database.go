@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"database/sql"
@@ -7,16 +7,11 @@ import (
 	"os"
 )
 
-type SqlDb struct {
-	db *sql.DB
-}
-
-func NewSqlDbConn() *SqlDb {
+func Connect() *sql.DB {
 	// intended for local only app. just hardcoded connection string here
 	db, err := sql.Open("postgres", os.Getenv("POSTGRESQL_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return &SqlDb{db: db}
+	return db
 }
