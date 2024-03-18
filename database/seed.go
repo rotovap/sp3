@@ -8,11 +8,13 @@ import (
 )
 
 func seedExperiments(db *sql.DB) {
-	experiments := `
-    ('01012024-random reaction'),
+
+	// use sprintf instead of parameterized query since this is not user input data
+	// and many values need to be inserted
+	// or could write a for loop to run an insert on each batch of n items to insert
+	experiments := `('01012024-random reaction'),
     ('01012024-suzuki coupling'),
-    ('An experiment with no reagents yet')
-    `
+    ('An experiment with no reagents yet');`
 
 	stmt := fmt.Sprintf("INSERT INTO experiment (name) VALUES %s", experiments)
 	_, err := db.Exec(stmt)
@@ -37,6 +39,9 @@ func seedReagents(db *sql.DB) {
         ('K2CO3', 'O=C([O-])[O-].[K+].[K+]', 138.205, NULL),
         (NULL, 'CS(=O)(=O)c1cccc(-c2cccnc2)c1', 233.05104, NULL)`
 
+	// use sprintf instead of parameterized query since this is not user input data
+	// and many values need to be inserted
+	// or could write a for loop to run an insert on each batch of n items to insert
 	stmt := fmt.Sprintf(`INSERT INTO reagent (name, mol, molecular_weight, density) VALUES %s`, reagents)
 	_, err := db.Exec(stmt)
 
@@ -129,10 +134,15 @@ func seedAssignReagentsToExperiments(db *sql.DB) {
 		assignmentStrings = append(assignmentStrings, s)
 	}
 	values := strings.Join(assignmentStrings[:], ",")
+
+	// use sprintf instead of parameterized query since this is not user input data
+	// and many values need to be inserted
+	// or could write a for loop to run an insert on each batch of n items to insert
 	stmt := fmt.Sprintf(`
     INSERT INTO experiment_reagent_association 
     (reagent_id, exp_id, reaction_scheme_location, equivalents, limiting_reagent )
     VALUES %s`, values)
+
 	_, err := db.Exec(stmt)
 	if err != nil {
 		log.Fatalf("Error inserting experiment_reagent_association: %s", err)
