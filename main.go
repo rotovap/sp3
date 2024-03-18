@@ -16,7 +16,9 @@ func main() {
 	defer env.Db.Close()
 
 	mux.HandleFunc("GET /experiment/{id}/", env.GetExperimentHandler)
-	log.Println("Listening on :8080")
+	// for finding similar reagents, use `?like=query`
+	mux.HandleFunc("GET /reagent", env.GetSimilarReagentsByNameHandler)
+	log.Println("Listening on :8000")
 	log.Fatal(http.ListenAndServe("localhost:8000", mux))
 
 }
