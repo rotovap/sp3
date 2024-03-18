@@ -4,7 +4,7 @@ migrate_up:
 migrate_down: 
 	migrate -database ${POSTGRESQL_URL} -path database/migrations down
 
-test:
+test: build
 	go test -v ./models
 
 # generate templ templates
