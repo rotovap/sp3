@@ -1,14 +1,20 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/rotovap/sp3/models"
 	"github.com/rotovap/sp3/views"
 )
 
 func (env *Env) GetSimilarReagentsByNameHandler(w http.ResponseWriter, r *http.Request) {
+	// right now this is only used in adding reagent to experiments
+	// this might be useful in another place to search for reagents
+	experimentId := r.PathValue("id")
+	fmt.Println(experimentId)
 	err := r.ParseForm()
 	if err != nil {
 		log.Printf("Error parsing form: %s", err)
@@ -21,12 +27,39 @@ func (env *Env) GetSimilarReagentsByNameHandler(w http.ResponseWriter, r *http.R
 			log.Fatal(err)
 		}
 
-		views.ReagentSearchResultsTable(reagents).Render(r.Context(), w)
+		views.ReagentSearchResultsTable(reagents, experimentId).Render(r.Context(), w)
 
 	}
 
 }
 
-func (env *Env) GetAddReagentPageHandler(w http.ResponseWriter, r *http.Request) {
-	views.AddReagentPage().Render(r.Context(), w)
+func (env *Env) GetAddReagentToExperimentPageHandler(w http.ResponseWriter, r *http.Request) {
+	// pass the experiment Id along from the URL path so that the reagent can be assigned to that experiment
+	experimentId := r.PathValue("id")
+	views.AddReagentToExperimentPage(experimentId).Render(r.Context(), w)
+}
+
+func (env *Env) SelectReagentToAssignToExperimentHandler(w http.ResponseWriter, r *http.Request) {
+	experimentId := r.PathValue("id")
+	reagentId := r.PathValue("reagentId")
+	// err := r.ParseForm()
+	// if err != nil {
+	// 	log.Printf("Error parsing form: %s", err)
+	// }
+
+	// // reagent id passed along from the button
+	// reagentId := r.FormValue("reagentId")
+	// fmt.Printf("reagent id: %s", reagentId)
+
+	// TODO: make model to assign the reagent to the experiment
+	// experimentId := r.PathValue("id")
+	experimentIdInt, err := strconv.Atoi(experimentId)
+	if err != nil {
+		log.Fatalf("Error parsing experiment id parameter: %s", experimentId)
+	}
+	experiment := models.GetExperimentById(env.Db, experimentIdInt)
+	fmt.Println(experimentId, reagentId)
+
+	// after the reagent is selected render the disabled button
+	views.AddReagentDetailsToExperiment(experimentId, experiment.Name).Render(r.Context(), w)
 }
