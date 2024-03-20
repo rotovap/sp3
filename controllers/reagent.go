@@ -52,14 +52,19 @@ func (env *Env) SelectReagentToAssignToExperimentHandler(w http.ResponseWriter, 
 	// fmt.Printf("reagent id: %s", reagentId)
 
 	// TODO: make model to assign the reagent to the experiment
-	// experimentId := r.PathValue("id")
 	experimentIdInt, err := strconv.Atoi(experimentId)
 	if err != nil {
 		log.Fatalf("Error parsing experiment id parameter: %s", experimentId)
 	}
+	reagentIdInt, err := strconv.Atoi(reagentId)
+	if err != nil {
+		log.Fatalf("Error parsing reagent id parameter: %s", reagentId)
+	}
+
 	experiment := models.GetExperimentById(env.Db, experimentIdInt)
+	reagent, molSVG := models.GetReagentById(env.Db, reagentIdInt)
 	fmt.Println(experimentId, reagentId)
 
-	// after the reagent is selected render the disabled button
-	views.AddReagentDetailsToExperiment(experimentId, experiment.Name).Render(r.Context(), w)
+	// after the reagent is selected go to the page to add details to the experiment
+	views.AddReagentDetailsToExperiment(experimentId, experiment.Name, *reagent, molSVG).Render(r.Context(), w)
 }

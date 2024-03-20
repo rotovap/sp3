@@ -70,8 +70,7 @@ func GetReagentsInExperiment(db *sql.DB, experimentId int) ([]GetReagentsInExper
 		if err != nil {
 			panic(err)
 		}
-		headerLen := len("<?xml version='1.0' encoding='iso-8859-1'?>")
-		e.MolSvg = mol.String[headerLen:]
+		e.MolSvg = mol.String[SVG_HEADER_LEN:]
 		r := &GetReagentsInExperimentResult{
 			Experiment:  *expt,
 			Reagent:     *reagent,

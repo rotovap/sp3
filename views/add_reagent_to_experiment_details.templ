@@ -1,8 +1,13 @@
 package views
 
+import (
+	"github.com/rotovap/sp3/models"
+	"strconv"
+)
+
 // after selecting the reagent from the DB, add the details for
 // this reagent in the experiment
-templ AddReagentDetailsToExperiment(experimentId string, experimentName string) {
+templ AddReagentDetailsToExperiment(experimentId string, experimentName string, reagent models.Reagent, molSVG string) {
 	@Base() {
 		<header class="container">
 			<div class="grid">
@@ -17,6 +22,31 @@ templ AddReagentDetailsToExperiment(experimentId string, experimentName string) 
 			</div>
 		</header>
 		<main class="container">
+			<div class="grid">
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">ID</th>
+							<th scope="col">Structure</th>
+							<th scope="col">Name</th>
+							<th scope="col">Mol. Weight (g/mol)</th>
+							<th scope="col">Density (g/mL)</th>
+							<th scope="col"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td scope="row">{ strconv.Itoa(reagent.Id) }</td>
+							<td>
+								@templ.Raw(molSVG)
+							</td>
+							<td>{ reagent.Name.String }</td>
+							<td>{ strconv.FormatFloat(float64(reagent.MolecularWeight), 'f', -1, 32) }</td>
+							<td>{ strconv.FormatFloat(float64(reagent.Density.Float64), 'f', -1, 32) }</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 			<form>
 				<div class="grid">
 					<p>Location of the reagent in the reaction scheme:</p>
