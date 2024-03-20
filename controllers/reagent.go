@@ -1,23 +1,32 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/rotovap/sp3/models"
+	"github.com/rotovap/sp3/views"
 )
 
 func (env *Env) GetSimilarReagentsByNameHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.Query())
-	query := r.URL.Query().Get("like")
-	fmt.Println(query)
-	reagents, err := models.GetSimilarReagents(env.Db, query)
-
+	err := r.ParseForm()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error parsing form: %s", err)
+	}
+	query := r.FormValue("search")
+	if query != "" {
+		reagents, err := models.GetSimilarReagents(env.Db, query)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		views.ReagentSearchResultsTable(reagents).Render(r.Context(), w)
+
 	}
 
-	fmt.Println(reagents)
+}
 
+func (env *Env) GetAddReagentPageHandler(w http.ResponseWriter, r *http.Request) {
+	views.AddReagentPage().Render(r.Context(), w)
 }

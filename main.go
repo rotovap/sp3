@@ -17,7 +17,8 @@ func main() {
 
 	mux.HandleFunc("GET /experiment/{id}/", env.GetExperimentHandler)
 	// for finding similar reagents, use `?like=query`
-	mux.HandleFunc("GET /reagent", env.GetSimilarReagentsByNameHandler)
+	mux.HandleFunc("POST /searchReagents", env.GetSimilarReagentsByNameHandler)
+	mux.HandleFunc("GET /addReagent", env.GetAddReagentPageHandler)
 	log.Println("Listening on :8000")
 	log.Fatal(http.ListenAndServe("localhost:8000", mux))
 

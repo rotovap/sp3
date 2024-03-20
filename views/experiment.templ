@@ -56,6 +56,12 @@ templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 	</table>
 }
 
+templ AddReagentButton() {
+	<a href="/addReagent">
+		<button>Add reagent</button>
+	</a>
+}
+
 templ ExperimentPage(id int, e []models.GetReagentsInExperimentResult, leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) {
 	@Base() {
 		<header class="container">
@@ -70,6 +76,9 @@ templ ExperimentPage(id int, e []models.GetReagentsInExperimentResult, leftSideR
 		</main>
 		<main class="container">
 			@ReagentTable(e)
+			<div style="text-align: center">
+				@AddReagentButton()
+			</div>
 		</main>
 	}
 }

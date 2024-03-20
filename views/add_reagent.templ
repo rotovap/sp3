@@ -1,0 +1,51 @@
+package views
+
+import (
+	"strconv"
+	"github.com/rotovap/sp3/models"
+)
+
+templ ReagentSearchResultsTable(reagents []models.Reagent) {
+	for _, r := range reagents {
+		<tr>
+			<td scope="row">{ strconv.Itoa(r.Id) }</td>
+			<td>{ r.Name.String }</td>
+			<td>{ strconv.FormatFloat(float64(r.MolecularWeight), 'f', -1, 32) }</td>
+			<td>{ strconv.FormatFloat(float64(r.Density.Float64), 'f', -1, 32) }</td>
+		</tr>
+	}
+}
+
+templ AddReagentPage() {
+	@Base() {
+		<header class="container">
+			<div class="grid">
+				<h3>
+					Add Reagent
+				</h3>
+			</div>
+		</header>
+		<main class="container">
+			<input
+				class="form-control"
+				type="search"
+				name="search"
+				placeholder="Begin Typing To Search Reagents..."
+				hx-post="/searchReagents"
+				hx-trigger="input changed delay:50ms, search"
+				hx-target="#search-results"
+			/>
+			<table>
+				<thead>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">Name</th>
+						<th scope="col">Mol. Weight (g/mol)</th>
+						<th scope="col">Density (g/mL)</th>
+					</tr>
+				</thead>
+				<tbody id="search-results"></tbody>
+			</table>
+		</main>
+	}
+}
