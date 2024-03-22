@@ -14,7 +14,11 @@ templ ReagentSearchResultsTable(reagents []models.Reagent, experimentId string) 
 	for _, r := range reagents {
 		<tr>
 			<td scope="row">{ strconv.Itoa(r.Id) }</td>
-			<td>{ r.Name.String }</td>
+			<td>
+				<div hx-get={ string(templ.URL(fmt.Sprintf("/reagentStructure/%d", r.Id))) } hx-trigger="mouseenter once">
+					{ r.Name.String }
+				</div>
+			</td>
 			<td>{ strconv.FormatFloat(float64(r.MolecularWeight), 'f', -1, 32) }</td>
 			<td>{ strconv.FormatFloat(float64(r.Density.Float64), 'f', -1, 32) }</td>
 			<td>

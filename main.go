@@ -23,6 +23,7 @@ func main() {
 	mux.HandleFunc("POST /experiment/{id}/addReagent/searchReagents", env.GetSimilarReagentsByNameHandler)
 	// get the search for reagents page in order to add reagent to the experiment
 	mux.HandleFunc("GET /experiment/{id}/addReagent", env.GetAddReagentToExperimentPageHandler)
+	mux.HandleFunc("GET /reagentStructure/{id}", env.GetReagentStructure)
 	log.Println("Listening on :8000")
 	log.Fatal(http.ListenAndServe("localhost:8000", mux))
 
