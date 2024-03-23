@@ -39,6 +39,8 @@ templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 				<th scope="col">ID</th>
 				<th scope="col">Name</th>
 				<th scope="col">Mol. Weight (g/mol)</th>
+				<th scope="col">mmol</th>
+				<th scope="col">Eq</th>
 				<th scope="col">Density (g/mL)</th>
 				<th scope="col">Amount (g)</th>
 			</tr>
@@ -49,6 +51,8 @@ templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 					<td scope="row">{ strconv.Itoa(r.Reagent.Id) }</td>
 					<td>{ r.Reagent.Name.String }</td>
 					<td>{ strconv.FormatFloat(float64(r.Reagent.MolecularWeight), 'f', -1, 32) }</td>
+					<td>MMOL</td>
+					<td>{ strconv.FormatFloat(float64(r.Association.Equivalents.Float64), 'f', -1, 32) }</td>
 					<td>{ strconv.FormatFloat(float64(r.Reagent.Density.Float64), 'f', -1, 32) }</td>
 					<td>{ strconv.FormatFloat(float64(r.Association.AmountPlannedInGrams.Float64), 'f', -1, 32) }</td>
 				</tr>

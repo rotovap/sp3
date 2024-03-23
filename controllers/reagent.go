@@ -18,23 +18,29 @@ func (env *Env) GetSimilarReagentsByNameHandler(w http.ResponseWriter, r *http.R
 		log.Printf("Error parsing form: %s", err)
 	}
 	query := r.FormValue("search")
-	if query != "" {
-		reagents, err := models.GetSimilarReagents(env.Db, query)
+	reagents, err := models.GetSimilarReagents(env.Db, query)
 
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		views.ReagentSearchResultsTable(reagents, experimentId).Render(r.Context(), w)
-
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	views.ReagentSearchResultsTable(reagents, experimentId).Render(r.Context(), w)
 
 }
 
 func (env *Env) GetAddReagentToExperimentPageHandler(w http.ResponseWriter, r *http.Request) {
 	// pass the experiment Id along from the URL path so that the reagent can be assigned to that experiment
 	experimentId := r.PathValue("id")
-	views.AddReagentToExperimentPage(experimentId).Render(r.Context(), w)
+
+	// start off populating the list with all reagents in the DB
+	// after getting input, the DB will be searched and the resulting list replaced
+	reagents, err := models.GetSimilarReagents(env.Db, "")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	views.AddReagentToExperimentPage(experimentId, reagents).Render(r.Context(), w)
 }
 
 func (env *Env) SelectReagentToAssignToExperimentHandler(w http.ResponseWriter, r *http.Request) {

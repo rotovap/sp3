@@ -86,8 +86,8 @@ func GetReagentsInExperiment(db *sql.DB, experimentId int) ([]GetReagentsInExper
 		if err != nil {
 			log.Fatalf("Error scanning query for mol_to_svg: %s", err)
 		}
-		// remove the header so that it can properly render in browser
-		e.MolSvg = molSvg[SVG_HEADER_LEN:]
+		e.MolSvg = molSvg
+
 		r := &GetReagentsInExperimentResult{
 			Experiment:  *expt,
 			Reagent:     *reagent,

@@ -122,7 +122,7 @@ func AddReagentDetailsToExperiment(experimentId string, experimentName string, r
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td></tr></tbody></table></div><form><div class=\"grid\"><p>Location of the reagent in the reaction scheme:</p><select name=\"reaction-scheme-location\" aria-label=\"Location of reagent in the reaction scheme\" required><option>Left side</option> <option>Right side</option> <option>Above arrow</option> <option>Below arrow</option></select></div><div class=\"grid\"><p>Equivalents:</p><input type=\"number\" name=\"equivalents\" placeholder=\"Equivalents\" aria-label=\"Equivalents\"></div><div class=\"grid\"><p>Amount planned (mg):</p><input type=\"number\" name=\"amountPlanned\" placeholder=\"Amount planned (mg)\" aria-label=\"Amount planned (mg)\"></div></form></main>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td></tr></tbody></table></div><form><div class=\"grid\"><p>Location of the reagent in the reaction scheme:</p><select name=\"reaction-scheme-location\" aria-label=\"Location of reagent in the reaction scheme\" required><option>Left side</option> <option>Right side</option> <option>Above arrow</option> <option>Below arrow</option></select></div><div class=\"grid\"><p>Equivalents:</p><input type=\"number\" name=\"equivalents\" placeholder=\"Equivalents\" aria-label=\"Equivalents\"></div></form></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

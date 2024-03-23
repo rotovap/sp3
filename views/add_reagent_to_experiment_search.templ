@@ -14,10 +14,9 @@ templ ReagentSearchResultsTable(reagents []models.Reagent, experimentId string) 
 	for _, r := range reagents {
 		<tr>
 			<td scope="row">{ strconv.Itoa(r.Id) }</td>
+			<td>{ r.Name.String }</td>
 			<td>
-				<div hx-get={ string(templ.URL(fmt.Sprintf("/reagentStructure/%d", r.Id))) } hx-trigger="mouseenter once">
-					{ r.Name.String }
-				</div>
+				@templ.Raw(r.Mol.String)
 			</td>
 			<td>{ strconv.FormatFloat(float64(r.MolecularWeight), 'f', -1, 32) }</td>
 			<td>{ strconv.FormatFloat(float64(r.Density.Float64), 'f', -1, 32) }</td>
@@ -43,7 +42,7 @@ templ ReagentSearchResultsTable(reagents []models.Reagent, experimentId string) 
 	}
 }
 
-templ AddReagentToExperimentPage(experimentId string) {
+templ AddReagentToExperimentPage(experimentId string, reagents []models.Reagent) {
 	@Base() {
 		<header class="container">
 			<div class="grid">
@@ -71,12 +70,15 @@ templ AddReagentToExperimentPage(experimentId string) {
 					<tr>
 						<th scope="col">ID</th>
 						<th scope="col">Name</th>
+						<th scope="col">Structure</th>
 						<th scope="col">Mol. Weight (g/mol)</th>
 						<th scope="col">Density (g/mL)</th>
 						<th scope="col"></th>
 					</tr>
 				</thead>
-				<tbody id="search-results"></tbody>
+				<tbody id="search-results">
+					@ReagentSearchResultsTable(reagents, experimentId)
+				</tbody>
 			</table>
 		</main>
 	}

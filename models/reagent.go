@@ -21,7 +21,11 @@ func GetSimilarReagents(db *sql.DB, reagentName string) ([]Reagent, error) {
 	stmt := fmt.Sprintf("%s%%", reagentName)
 
 	rows, err := db.Query(`
-    SELECT id, name, molecular_weight, density, mol::text
+    SELECT id, 
+          name,
+          molecular_weight,
+          density,
+          mol_to_svg(mol,'', 100, 100, '{"clearBackground": 0}')
     FROM reagent
     WHERE LOWER(name) LIKE LOWER($1);
     `, stmt)
@@ -63,7 +67,7 @@ func GetReagentById(db *sql.DB, id int) (*Reagent, string) {
 	if err != nil {
 		log.Fatalf("Error getting reagent by id: %s", err)
 	}
-	molSVG = molSVG[SVG_HEADER_LEN:]
+	// molSVG = molSVG[SVG_HEADER_LEN:]
 	return r, molSVG
 }
 
