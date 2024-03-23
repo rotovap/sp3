@@ -15,8 +15,16 @@ func main() {
 	env := &controllers.Env{Db: db}
 	defer env.Db.Close()
 
+	// show experiment page
 	mux.HandleFunc("GET /experiment/{id}/", env.GetExperimentHandler)
-	log.Println("Listening on :8080")
+	// select the reagent to assign to the experiment and then go to add details
+	mux.HandleFunc("GET /experiment/{id}/addReagent/{reagentId}", env.SelectReagentToAssignToExperimentHandler)
+	// run the search for reagents in order to add them to the experiment
+	mux.HandleFunc("POST /experiment/{id}/addReagent/searchReagents", env.GetSimilarReagentsByNameHandler)
+	// get the search for reagents page in order to add reagent to the experiment
+	mux.HandleFunc("GET /experiment/{id}/addReagent", env.GetAddReagentToExperimentPageHandler)
+	mux.HandleFunc("GET /reagentStructure/{id}", env.GetReagentStructure)
+	log.Println("Listening on :8000")
 	log.Fatal(http.ListenAndServe("localhost:8000", mux))
 
 }

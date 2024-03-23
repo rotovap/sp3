@@ -70,7 +70,7 @@ func TestGetExperimentById(t *testing.T) {
 		}
 	})
 
-	t.Run("returns nothing if experiment not found", func(t *testing.T) {
+	t.Run("returns empty slice if experiment not found", func(t *testing.T) {
 		mEnv.migrateDownUp()
 		result, _ := GetReagentsInExperiment(mEnv.db, 100)
 		if len(result) != 0 {

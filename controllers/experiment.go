@@ -33,6 +33,6 @@ func (env *Env) GetExperimentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	views.ExperimentPage(id, result, leftSideReagents, rightSideReagents).Render(r.Context(), w)
+	views.ExperimentPage(id, result[0].Experiment.Name, result, leftSideReagents, rightSideReagents).Render(r.Context(), w)
 
 }

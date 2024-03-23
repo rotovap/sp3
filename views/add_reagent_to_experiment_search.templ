@@ -1,0 +1,83 @@
+package views
+
+import (
+	"fmt"
+	"strconv"
+	"github.com/rotovap/sp3/models"
+)
+
+templ SelectedReagent() {
+	<button disabled class="contrast">SELECTED</button>
+}
+
+templ ReagentSearchResultsTable(reagents []models.Reagent, experimentId string) {
+	for _, r := range reagents {
+		<tr>
+			<td scope="row">{ strconv.Itoa(r.Id) }</td>
+			<td>
+				<div hx-get={ string(templ.URL(fmt.Sprintf("/reagentStructure/%d", r.Id))) } hx-trigger="mouseenter once">
+					{ r.Name.String }
+				</div>
+			</td>
+			<td>{ strconv.FormatFloat(float64(r.MolecularWeight), 'f', -1, 32) }</td>
+			<td>{ strconv.FormatFloat(float64(r.Density.Float64), 'f', -1, 32) }</td>
+			<td>
+				<a href={ templ.URL(fmt.Sprintf("/experiment/%s/addReagent/%d", experimentId, r.Id)) }>
+					<button>
+						SELECT
+					</button>
+				</a>
+				<!--				<button
+					hx-post={ string(templ.URL(fmt.Sprintf("/experiment/%s/addReagent", experimentId))) }
+					hx-target="#select-reagent"
+					hx-include="add-reagent-form"
+					hx-swap="outerHTML"
+					id="select-reagent"
+					name="reagentId"
+					value={ strconv.Itoa(r.Id) }
+				>
+					SELECT
+				</button> -->
+			</td>
+		</tr>
+	}
+}
+
+templ AddReagentToExperimentPage(experimentId string) {
+	@Base() {
+		<header class="container">
+			<div class="grid">
+				<h3>
+					Add Reagent
+				</h3>
+			</div>
+		</header>
+		<main class="container">
+			<form
+				id="search-existing-reagents-form"
+			>
+				<input
+					class="form-control"
+					type="search"
+					name="search"
+					placeholder="Begin Typing To Search Reagents..."
+					hx-post={ string(templ.URL(fmt.Sprintf("/experiment/%s/addReagent/searchReagents", experimentId))) }
+					hx-trigger="input changed delay:50ms, search"
+					hx-target="#search-results"
+				/>
+			</form>
+			<table>
+				<thead>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">Name</th>
+						<th scope="col">Mol. Weight (g/mol)</th>
+						<th scope="col">Density (g/mL)</th>
+						<th scope="col"></th>
+					</tr>
+				</thead>
+				<tbody id="search-results"></tbody>
+			</table>
+		</main>
+	}
+}

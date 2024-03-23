@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"strconv"
 	"github.com/rotovap/sp3/models"
 )
@@ -35,6 +36,7 @@ templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 	<table>
 		<thead>
 			<tr>
+				<th scope="col">ID</th>
 				<th scope="col">Name</th>
 				<th scope="col">Mol. Weight (g/mol)</th>
 				<th scope="col">Density (g/mL)</th>
@@ -44,7 +46,8 @@ templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 		<tbody>
 			for _, r := range rows {
 				<tr>
-					<td scope="row">{ r.Reagent.Name.String }</td>
+					<td scope="row">{ strconv.Itoa(r.Reagent.Id) }</td>
+					<td>{ r.Reagent.Name.String }</td>
 					<td>{ strconv.FormatFloat(float64(r.Reagent.MolecularWeight), 'f', -1, 32) }</td>
 					<td>{ strconv.FormatFloat(float64(r.Reagent.Density.Float64), 'f', -1, 32) }</td>
 					<td>{ strconv.FormatFloat(float64(r.Association.AmountPlannedInGrams.Float64), 'f', -1, 32) }</td>
@@ -54,16 +57,25 @@ templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 	</table>
 }
 
-templ ExperimentPage(id int, e []models.GetReagentsInExperimentResult, leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) {
+templ ExperimentPage(id int, experimentName string, e []models.GetReagentsInExperimentResult, leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) {
 	@Base() {
-		<main class="container">
+		<header class="container">
 			<div class="grid">
 				<h1>
-					Experiment { strconv.Itoa(id) }: { e[0].Experiment.Name }
+					Experiment { strconv.Itoa(id) }: { experimentName }
 				</h1>
 			</div>
+		</header>
+		<main class="container">
 			@ReactionScheme(leftSideReagents, rightSideReagents)
+		</main>
+		<main class="container">
 			@ReagentTable(e)
+			<div style="text-align: center">
+				<a href={ templ.URL(fmt.Sprintf("/experiment/%d/addReagent", id)) }>
+					<button>Add reagent</button>
+				</a>
+			</div>
 		</main>
 	}
 }
