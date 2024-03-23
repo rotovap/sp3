@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
+	"log"
 )
 
 type ExperimentReagentAssociation struct {
@@ -36,8 +38,7 @@ func GetReagentsInExperiment(db *sql.DB, experimentId int) ([]GetReagentsInExper
                 r.name AS reagent_name,
                 r.molecular_weight,
                 r.density,
-                -- clearBackground: 0 will make a transparent background, but the bonds are black so on black background, you can't see the molecule
-                mol_to_svg(r.mol,'', 100, 100, '{"clearBackground": 0}')
+                r.mol
           FROM experiment e
           INNER JOIN experiment_reagent_association era
           ON era.exp_id=e.id
@@ -70,7 +71,23 @@ func GetReagentsInExperiment(db *sql.DB, experimentId int) ([]GetReagentsInExper
 		if err != nil {
 			panic(err)
 		}
-		e.MolSvg = mol.String[SVG_HEADER_LEN:]
+
+		// want to put the reagent id as the legend, but
+		// could not get quote_literal(id) into the mol_to_svg function as part of the above query,
+		// so use string format to get the id in as a quote literal for the legend
+		// then use a query param to get the mol in, which was queried above
+
+		// -- clearBackground: 0 will make a transparent background, but the bonds are black so on black background, you can't see the molecule
+		q := fmt.Sprintf(`SELECT mol_to_svg($1::mol,'%d', 100, 100, '{"clearBackground": 0}')`, reagent.Id)
+		svgRow := db.QueryRow(q, mol.String)
+
+		var molSvg string
+		err = svgRow.Scan(&molSvg)
+		if err != nil {
+			log.Fatalf("Error scanning query for mol_to_svg: %s", err)
+		}
+		// remove the header so that it can properly render in browser
+		e.MolSvg = molSvg[SVG_HEADER_LEN:]
 		r := &GetReagentsInExperimentResult{
 			Experiment:  *expt,
 			Reagent:     *reagent,
