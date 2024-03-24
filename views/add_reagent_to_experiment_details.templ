@@ -3,6 +3,7 @@ package views
 import (
 	"github.com/rotovap/sp3/models"
 	"strconv"
+	"fmt"
 )
 
 // after selecting the reagent from the DB, add the details for
@@ -47,9 +48,11 @@ templ AddReagentDetailsToExperiment(experimentId string, experimentName string, 
 					</tbody>
 				</table>
 			</div>
-			<form>
+			<form
+				hx-post={ string(fmt.Sprintf("/experiment/%s/addReagent/%d", experimentId, reagent.Id)) }
+			>
 				<div class="grid">
-					<p>Location of the reagent in the reaction scheme:</p>
+					<label>Location of the reagent in the reaction scheme:</label>
 					<select
 						name="reaction-scheme-location"
 						aria-label="Location of reagent in the reaction scheme"
@@ -67,6 +70,7 @@ templ AddReagentDetailsToExperiment(experimentId string, experimentName string, 
 					</p>
 					<input type="number" name="equivalents" placeholder="Equivalents" aria-label="Equivalents"/>
 				</div>
+				<button>ADD TO EXPERIMENT</button>
 			</form>
 		</main>
 	}

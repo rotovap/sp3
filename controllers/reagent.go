@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -47,7 +48,6 @@ func (env *Env) SelectReagentToAssignToExperimentHandler(w http.ResponseWriter, 
 	experimentId := r.PathValue("id")
 	reagentId := r.PathValue("reagentId")
 
-	// TODO: make model to assign the reagent to the experiment
 	experimentIdInt, err := strconv.Atoi(experimentId)
 	if err != nil {
 		log.Fatalf("Error parsing experiment id parameter: %s", experimentId)
@@ -62,6 +62,30 @@ func (env *Env) SelectReagentToAssignToExperimentHandler(w http.ResponseWriter, 
 
 	// after the reagent is selected go to the page to add details to the experiment
 	views.AddReagentDetailsToExperiment(experimentId, experiment.Name, *reagent, molSVG).Render(r.Context(), w)
+}
+
+func (env *Env) AssignReagentToExperimentHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatalf("error parsing form in AssignReagentToExperimentHandler: %s", err)
+	}
+
+	experimentId := r.PathValue("id")
+	// reagentId := r.PathValue("reagentId")
+
+	eq := r.FormValue("equivalents")
+	loc := r.FormValue("reaction-scheme-location")
+	if eq == "" {
+		fmt.Println("EMPTy")
+		// TODO: replace the form again if empty with aria-invalid=true
+		env.SelectReagentToAssignToExperimentHandler(w, r)
+	} else {
+		// otherwise go back to the experiment page because it was successful
+		// TODO: save to db
+		fmt.Println(eq, loc, experimentId)
+		fmt.Println("HERE")
+		http.Redirect(w, r, fmt.Sprintf("/experiment/%s", experimentId), 302)
+	}
 }
 
 func (env *Env) GetReagentStructure(w http.ResponseWriter, r *http.Request) {

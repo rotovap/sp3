@@ -11,6 +11,7 @@ import "io"
 import "bytes"
 
 import (
+	"fmt"
 	"github.com/rotovap/sp3/models"
 	"strconv"
 )
@@ -43,7 +44,7 @@ func AddReagentDetailsToExperiment(experimentId string, experimentName string, r
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(experimentId)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 18, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 19, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -56,7 +57,7 @@ func AddReagentDetailsToExperiment(experimentId string, experimentName string, r
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(experimentName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 18, Col: 51}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 19, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -69,7 +70,7 @@ func AddReagentDetailsToExperiment(experimentId string, experimentName string, r
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(reagent.Id))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 38, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 39, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -90,7 +91,7 @@ func AddReagentDetailsToExperiment(experimentId string, experimentName string, r
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(reagent.Name.String)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 42, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 43, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -103,7 +104,7 @@ func AddReagentDetailsToExperiment(experimentId string, experimentName string, r
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(reagent.MolecularWeight), 'f', -1, 32))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 43, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 44, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -116,13 +117,21 @@ func AddReagentDetailsToExperiment(experimentId string, experimentName string, r
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(float64(reagent.Density.Float64), 'f', -1, 32))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 44, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/add_reagent_to_experiment_details.templ`, Line: 45, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td></tr></tbody></table></div><form><div class=\"grid\"><p>Location of the reagent in the reaction scheme:</p><select name=\"reaction-scheme-location\" aria-label=\"Location of reagent in the reaction scheme\" required><option>Left side</option> <option>Right side</option> <option>Above arrow</option> <option>Below arrow</option></select></div><div class=\"grid\"><p>Equivalents:</p><input type=\"number\" name=\"equivalents\" placeholder=\"Equivalents\" aria-label=\"Equivalents\"></div></form></main>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td></tr></tbody></table></div><form hx-post=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(fmt.Sprintf("/experiment/%s/addReagent/%d", experimentId, reagent.Id))))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><div class=\"grid\"><label>Location of the reagent in the reaction scheme:</label> <select name=\"reaction-scheme-location\" aria-label=\"Location of reagent in the reaction scheme\" required><option>Left side</option> <option>Right side</option> <option>Above arrow</option> <option>Below arrow</option></select></div><div class=\"grid\"><p>Equivalents:</p><input type=\"number\" name=\"equivalents\" placeholder=\"Equivalents\" aria-label=\"Equivalents\"></div><button>ADD TO EXPERIMENT</button></form></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
