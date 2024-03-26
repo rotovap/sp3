@@ -1,9 +1,10 @@
-package views
+package experiment_views
 
 import (
 	"fmt"
 	"strconv"
 	"github.com/rotovap/sp3/models"
+	"github.com/rotovap/sp3/views/shared/base"
 )
 
 templ SelectedReagent() {
@@ -42,8 +43,8 @@ templ ReagentSearchResultsTable(reagents []models.Reagent, experimentId string) 
 	}
 }
 
-templ AddReagentToExperimentPage(experimentId string, reagents []models.Reagent) {
-	@Base() {
+templ ReagentSearchPage(experimentId string, reagents []models.Reagent) {
+	@base.Base() {
 		<header class="container">
 			<div class="grid">
 				<h3>

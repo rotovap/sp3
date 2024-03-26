@@ -1,9 +1,13 @@
-package views
+// these are the views for the experiment page which shows all the information
+// for an experiment
+// reagents can be added to the experiment and that will lead to different pages
+package experiment_views
 
 import (
 	"fmt"
 	"strconv"
 	"github.com/rotovap/sp3/models"
+	"github.com/rotovap/sp3/views/shared/base"
 )
 
 // cannot seem to store a variable inside the template and the reference it again
@@ -62,7 +66,7 @@ templ ReagentTable(rows []models.GetReagentsInExperimentResult) {
 }
 
 templ ExperimentPage(id int, experimentName string, e []models.GetReagentsInExperimentResult, leftSideReagents []models.ExperimentReagentAssociation, rightSideReagents []models.ExperimentReagentAssociation) {
-	@Base() {
+	@base.Base() {
 		<header class="container">
 			<div class="grid">
 				<h1>
@@ -76,7 +80,7 @@ templ ExperimentPage(id int, experimentName string, e []models.GetReagentsInExpe
 		<main class="container">
 			@ReagentTable(e)
 			<div style="text-align: center">
-				<a href={ templ.URL(fmt.Sprintf("/experiment/%d/addReagent", id)) }>
+				<a href={ templ.URL(fmt.Sprintf("/experiment/%d/addReagent/searchReagents", id)) }>
 					<button>Add reagent</button>
 				</a>
 			</div>

@@ -18,7 +18,7 @@ func main() {
 	// show experiment page
 	mux.HandleFunc("GET /experiment/{id}/", env.GetExperimentHandler)
 	// get the search for reagents page in order to add reagent to the experiment
-	mux.HandleFunc("GET /experiment/{id}/addReagent", env.GetAddReagentToExperimentPageHandler)
+	mux.HandleFunc("GET /experiment/{id}/addReagent/searchReagents", env.ReagentSearchForExperimentHandler)
 	// run the search for reagents in order to add them to the experiment
 	mux.HandleFunc("POST /experiment/{id}/addReagent/searchReagents", env.GetSimilarReagentsByNameHandler)
 	// select the reagent to assign to the experiment and then go to add details

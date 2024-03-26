@@ -1,7 +1,8 @@
-package views
+package experiment_views
 
 import (
 	"github.com/rotovap/sp3/models"
+	"github.com/rotovap/sp3/views/shared/base"
 	"strconv"
 	"fmt"
 )
@@ -9,7 +10,7 @@ import (
 // after selecting the reagent from the DB, add the details for
 // this reagent in the experiment
 templ AddReagentDetailsToExperiment(experimentId string, experimentName string, reagent models.Reagent, molSVG string) {
-	@Base() {
+	@base.Base() {
 		<header class="container">
 			<div class="grid">
 				<hgroup>
