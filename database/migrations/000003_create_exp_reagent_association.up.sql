@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS experiment_reagent_association (
   equivalents real,
   limiting_reagent boolean,
   amount_planned_in_grams real,
-  amount_planned_unit reagent_unit
+  amount_planned_unit reagent_unit,
+  -- do not allow a reagent to be assigned to an experiment multiple times
+  UNIQUE (exp_id, reagent_id)
 );
 

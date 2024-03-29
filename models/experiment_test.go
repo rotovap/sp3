@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"log"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/golang-migrate/migrate"
@@ -78,4 +80,51 @@ func TestGetExperimentById(t *testing.T) {
 		}
 	})
 
+}
+
+func TestAssignReagentToExperiment(t *testing.T) {
+	mEnv := setupSuite(t)
+
+	t.Run("assigns a reagent to an experiment", func(t *testing.T) {
+		mEnv.migrateDownUp()
+		err := AssignReagentToExperiment(mEnv.db, 3, 1, "2", "ABOVE_ARROW", false)
+		if err != nil {
+			t.Errorf("expected no error, got: %s", err)
+		}
+		// check the db for the right result
+		row := mEnv.db.QueryRow(`
+        SELECT 
+              exp_id, 
+              reagent_id,
+              equivalents,
+              reaction_scheme_location,
+              limiting_reagent
+        FROM experiment_reagent_association WHERE exp_id=$1`,
+			3)
+		res := database.ExperimentReagentAssociation{}
+		row.Scan(&res.ExpId,
+			&res.ReagentId,
+			&res.Equivalents,
+			&res.ReactionSchemeLocation,
+			&res.LimitingReagent)
+
+		expectedResult := database.ExperimentReagentAssociation{
+			ExpId:                  3,
+			ReagentId:              1,
+			Equivalents:            2,
+			ReactionSchemeLocation: "ABOVE_ARROW",
+			LimitingReagent:        false,
+		}
+		if !reflect.DeepEqual(expectedResult, res) {
+			t.Errorf("expected %v, got %v", expectedResult, res)
+		}
+	})
+
+	t.Run("cannot add reagent to the same experiment twice", func(t *testing.T) {
+		mEnv.migrateDownUp()
+		err := AssignReagentToExperiment(mEnv.db, 1, 2, "2", "ABOVE_ARROW", false)
+		if !strings.Contains(err.Error(), "duplicate key value") {
+			t.Errorf("expected duplicate key value error but got: %s", err)
+		}
+	})
 }

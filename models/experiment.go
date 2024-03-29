@@ -112,3 +112,20 @@ func GetExperimentById(db *sql.DB, experimentId int) *Experiment {
 	row.Scan(&expt.Id, &expt.Name)
 	return expt
 }
+
+// make the initial assignment of the reagent to experiment
+// amounts will be calculated later depending on the limiting reagent
+func AssignReagentToExperiment(db *sql.DB, experimentId int, reagentId int, equivalents string, reactionSchemeLocation string, limitingReagent bool) error {
+	_, err := db.Exec(`
+    INSERT INTO experiment_reagent_association
+    (exp_id, reagent_id, reaction_scheme_location, equivalents, limiting_reagent)
+    VALUES
+    ($1, $2, $3, $4, $5)
+    `, experimentId,
+		reagentId,
+		reactionSchemeLocation,
+		equivalents,
+		limitingReagent)
+
+	return err
+}

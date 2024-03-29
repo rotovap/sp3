@@ -100,20 +100,30 @@ func (env *Env) AssignReagentToExperimentHandler(w http.ResponseWriter, r *http.
 		log.Fatalf("error parsing form in AssignReagentToExperimentHandler: %s", err)
 	}
 
-	experimentId := r.PathValue("id")
-	// reagentId := r.PathValue("reagentId")
+	experimentId, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		log.Fatalf("cannot convert experimentId to int")
+	}
+	reagentId, err := strconv.Atoi(r.PathValue("reagentId"))
+	if err != nil {
+		log.Fatalf("cannot convert reagentId to int")
+	}
 
 	eq := r.FormValue("equivalents")
-	loc := r.FormValue("reaction-scheme-location")
+	rsloc := r.FormValue("reaction-scheme-location")
+
 	if eq == "" {
 		fmt.Println("EMPTy")
 		// TODO: replace the form again if empty with aria-invalid=true
 		env.SelectReagentToAssignToExperimentHandler(w, r)
 	} else {
-		// otherwise go back to the experiment page because it was successful
-		// TODO: save to db
-		fmt.Println(eq, loc, experimentId)
-		fmt.Println("HERE")
-		http.Redirect(w, r, fmt.Sprintf("/experiment/%s", experimentId), 302)
+		// otherwise assign the reagent to the experiment
+		err := models.AssignReagentToExperiment(env.Db, experimentId, reagentId, eq, rsloc, false)
+		if err != nil {
+			log.Printf("error assigning reagent to experiment: %s", err)
+		}
+
+		// redirect to the experiment
+		http.Redirect(w, r, fmt.Sprintf("/experiment/%d", experimentId), 302)
 	}
 }

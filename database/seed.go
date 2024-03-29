@@ -53,85 +53,85 @@ func seedReagents(db *sql.DB) {
 }
 
 type ExperimentReagentAssociation struct {
-	expId                  int
-	reagentId              int
-	reactionSchemeLocation string
-	equivalents            float32
-	limitingReagent        bool
-	amountPlannedInGrams   float32
-	amountPlannedUnit      string
+	ExpId                  int
+	ReagentId              int
+	ReactionSchemeLocation string
+	Equivalents            float32
+	LimitingReagent        bool
+	AmountPlannedInGrams   float32
+	AmountPlannedUnit      string
 }
 
 func seedAssignReagentsToExperiments(db *sql.DB) {
 	assignments := []ExperimentReagentAssociation{
 		{
-			reagentId:              2,
-			expId:                  1,
-			reactionSchemeLocation: "ABOVE_ARROW",
-			equivalents:            1,
-			limitingReagent:        false,
-			amountPlannedInGrams:   20,
-			amountPlannedUnit:      "G"},
+			ReagentId:              2,
+			ExpId:                  1,
+			ReactionSchemeLocation: "ABOVE_ARROW",
+			Equivalents:            1,
+			LimitingReagent:        false,
+			AmountPlannedInGrams:   20,
+			AmountPlannedUnit:      "G"},
 		{
-			reagentId:              3,
-			expId:                  1,
-			reactionSchemeLocation: "BELOW_ARROW",
-			equivalents:            1,
-			amountPlannedInGrams:   20,
-			amountPlannedUnit:      "ML",
-			limitingReagent:        false},
+			ReagentId:              3,
+			ExpId:                  1,
+			ReactionSchemeLocation: "BELOW_ARROW",
+			Equivalents:            1,
+			AmountPlannedInGrams:   20,
+			AmountPlannedUnit:      "ML",
+			LimitingReagent:        false},
 		{
-			reagentId:              4,
-			expId:                  2,
-			reactionSchemeLocation: "LEFT_SIDE",
-			equivalents:            1,
-			limitingReagent:        true,
+			ReagentId:              4,
+			ExpId:                  2,
+			ReactionSchemeLocation: "LEFT_SIDE",
+			Equivalents:            1,
+			LimitingReagent:        true,
 		},
 		{
-			reagentId:              5,
-			expId:                  2,
-			reactionSchemeLocation: "LEFT_SIDE",
-			equivalents:            1,
-			limitingReagent:        false,
+			ReagentId:              5,
+			ExpId:                  2,
+			ReactionSchemeLocation: "LEFT_SIDE",
+			Equivalents:            1,
+			LimitingReagent:        false,
 		},
 		{
-			reagentId:              6,
-			expId:                  2,
-			reactionSchemeLocation: "ABOVE_ARROW",
-			equivalents:            1,
-			limitingReagent:        false,
+			ReagentId:              6,
+			ExpId:                  2,
+			ReactionSchemeLocation: "ABOVE_ARROW",
+			Equivalents:            1,
+			LimitingReagent:        false,
 		},
 		{
-			reagentId:              7,
-			expId:                  2,
-			reactionSchemeLocation: "BELOW_ARROW",
-			equivalents:            1,
-			limitingReagent:        false,
+			ReagentId:              7,
+			ExpId:                  2,
+			ReactionSchemeLocation: "BELOW_ARROW",
+			Equivalents:            1,
+			LimitingReagent:        false,
 		},
 		{
-			reagentId:              8,
-			expId:                  2,
-			reactionSchemeLocation: "BELOW_ARROW",
-			equivalents:            1,
-			limitingReagent:        false,
+			ReagentId:              8,
+			ExpId:                  2,
+			ReactionSchemeLocation: "BELOW_ARROW",
+			Equivalents:            1,
+			LimitingReagent:        false,
 		},
 		{
-			reagentId:              9,
-			expId:                  2,
-			reactionSchemeLocation: "RIGHT_SIDE",
-			equivalents:            1,
-			limitingReagent:        false,
+			ReagentId:              9,
+			ExpId:                  2,
+			ReactionSchemeLocation: "RIGHT_SIDE",
+			Equivalents:            1,
+			LimitingReagent:        false,
 		},
 	}
 
 	var assignmentStrings []string
 	for _, a := range assignments {
 		s := fmt.Sprintf(`(%d, %d, '%s', %f, %t)`,
-			a.reagentId,
-			a.expId,
-			a.reactionSchemeLocation,
-			a.equivalents,
-			a.limitingReagent)
+			a.ReagentId,
+			a.ExpId,
+			a.ReactionSchemeLocation,
+			a.Equivalents,
+			a.LimitingReagent)
 		assignmentStrings = append(assignmentStrings, s)
 	}
 	values := strings.Join(assignmentStrings[:], ",")

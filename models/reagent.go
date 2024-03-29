@@ -70,16 +70,3 @@ func GetReagentById(db *sql.DB, id int) (*Reagent, string) {
 	// molSVG = molSVG[SVG_HEADER_LEN:]
 	return r, molSVG
 }
-
-func AssignReagentToExperiment(db *sql.DB, reagentId int, experimentId int) {
-	_, err := db.Exec(`
-    INSERT INTO experiment_reagent_association era
-    (exp_id, reagent_id, reaction_scheme_location, equivalents, limiting_reagent, amount_planned_in_grams, amount_planned_unit)
-    VALUES
-    ($1, $2,)
-    `, experimentId, reagentId)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
